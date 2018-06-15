@@ -1,0 +1,59 @@
+version: '3'
+services:
+  db:
+    image: postgres:10.0
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    env_file:
+      - .env
+#    logging:
+#      driver: none
+    ports:
+      - '5432:5432'
+  redis:
+    image: redis:4.0-alpine
+    logging:
+      driver: none
+    ports:
+      - '6379:6379'
+#  rabbit:
+#    image: rabbitmq:3.7.2-management-alpine
+#    logging:
+#      driver: none
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    env_file:
+#      - .env
+#  celery:
+#    build:
+#      context: .
+#      dockerfile: ./deployment/dev/celery/Dockerfile
+#    entrypoint: /entrypoint.sh
+#    volumes:
+#      - .:/code
+#    env_file:
+#      - .env
+##    depends_on:
+##      - rabbit
+#    ports:
+#      - "5555:5555"
+  api:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./deployment/dev/api/Dockerfile
+    entrypoint: /entrypoint.sh
+    volumes:
+      - .:/code
+      - /tmp/vision:/tmp/vision
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+#      - celery
+    env_file:
+      - .env
+volumes:
+  pg_app:

@@ -1,0 +1,75 @@
+/* https://www.smashingmagazine.com/2016/05/fluid-typography/ */
+// Change scale
+$mod_1: 1.067;
+$mod_2: 1.333;
+
+// Fluid Type Mixin
+@function strip-unit($value) {
+  @return $value / ($value * 0 + 1);
+}
+
+@mixin fluid-type($min-vw, $max-vw, $min-font-size, $max-font-size) {
+  $u1: unit($min-vw);
+  $u2: unit($max-vw);
+  $u3: unit($min-font-size);
+  $u4: unit($max-font-size);
+
+  @if $u1 == $u2 and $u1 == $u3 and $u1 == $u4 {
+    & {
+      font-size: $min-font-size;
+      @media screen and (min-width: $min-vw) {
+        font-size: calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+      }
+
+      @media screen and (min-width: $max-vw) {
+        font-size: $max-font-size;
+      }
+    }
+  }
+}
+
+// Calculate Modular Scale
+
+$h1-min: $mod_1*$mod_1*$mod_1*$mod_1*1rem;
+$h1-max: $mod_2*$mod_2*$mod_2*$mod_2*1rem;
+
+$h2-min: $mod_1*$mod_1*$mod_1*1rem;
+$h2-max: $mod_2*$mod_2*$mod_2*1rem;
+
+$h3-min: $mod_1*$mod_1*1rem;
+$h3-max: $mod_2*$mod_2*1rem;
+
+$h4-min: $mod_1*1rem;
+$h4-max: $mod_2*1rem;
+
+$h5-min: 1rem;
+$h5-max: 1rem;
+
+$h6-min: $mod_2/1rem;
+$h6-max: $mod_2/1rem;
+
+html { 
+	h1{ 
+		@include fluid-type(37.5rem, 80rem, $h1-min, $h1-max);
+	}
+	
+	h2{ 
+		@include fluid-type(37.5rem, 80rem, $h2-min, $h2-max);
+	}
+	
+	h3{ 
+		@include fluid-type(37.5rem, 80rem, $h3-min, $h3-max);
+	}
+	
+	h4{ 
+		@include fluid-type(37.5rem, 80rem, $h4-min, $h4-max);
+	}
+	
+	h5{ 
+		@include fluid-type(37.5rem, 80rem, $h5-min, $h5-max);
+	}
+	
+	h6{	
+		@include fluid-type(37.5rem, 80rem, $h6-min, $h6-max);
+	}
+}

@@ -1,0 +1,31 @@
+#app-container {
+  height: 100vh;
+  overflow-y: hidden;
+}
+
+.application__container {
+  display: flex;
+  flex-direction: row;
+  overflow-y: hidden;
+}
+
+.application__content {
+  display: grid;
+  grid-template-rows: [info] 85px [content];
+  flex: 1 1 auto;
+}
+
+.application__inner_content {
+  height: calc(100vh - 115px);
+  grid-row-start: content;
+  grid-row-end: content;
+  overflow-y: auto;
+  margin: 0px;
+  padding: 15px 30px;
+
+  transition: margin 0.15s ease-in-out;
+
+  @media (max-width: 600px) {
+    padding: 15px 10px;
+  }
+}

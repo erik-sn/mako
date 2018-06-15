@@ -1,0 +1,23 @@
+$background: #f2f3f3;
+$background-light: #ffffff;
+$background-header: #fafafa;
+$background-info: #007dbc;
+$background-alert: #007dbc;
+
+$cta-dark: #ec7211;
+
+$font-link: $background-alert;
+$font-dark: #16191f;
+$font-med: #545b64;
+$font-light: $background-light;
+
+$error: darken(red, 5%);
+$warn: darken(yellow, 10%);
+$divider: #d5dbdb;
+
+$shadow: 0 1px 1px 0 rgba(0,28,36,.5);
+$shadow-bottom: 0px 0px 1px 0px rgba(0,28,36,.5);
+
+// z-index values
+$modal-index: 2;
+$modal-content-index: 3;

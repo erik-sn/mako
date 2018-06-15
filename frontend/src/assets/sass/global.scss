@@ -1,0 +1,68 @@
+// Global styles
+
+html,
+body {
+  margin: 0px;
+  height: 100vh;
+  background: $background;
+  font-family: 'Roboto', sans-serif;
+  overflow-y: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: $font-dark;
+  margin: 10px 0px;
+}
+
+a {
+  color: $font-link;
+}
+
+p {
+  color: $font-med;
+}
+
+label {
+  text-transform: capitalize;
+}
+
+// button {
+//   background: $cta-dark;
+//   color: $font-light;
+//   cursor: pointer;
+//   border: none;
+//   padding: 10px 35px;
+//   margin-top: 15px;
+//   margin-right: 5px;
+//   box-shadow: $shadow;
+//   border-radius: 2px;
+//   font-size: 14px;
+
+//   &:focus {
+//     box-shadow: 0 0 2pt 1pt $background-info;
+//   }
+
+//   &:hover {
+//     background: lighten($cta-dark, 15%);
+//   }
+// }
+
+pre {
+  line-height: 20px;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-style: italic;
+  font-size: 14px;
+  width: 100%;
+  height: 25px;
+}
