@@ -170,6 +170,7 @@ class GoogleSearch extends Component<IProps, IState> {
       deleteAfterMerge,
       searchesToMerge,
       loadingGoogleSearches,
+      loading,
       mergeSuccess,
     } = this.state;
     const { classes } = this.props;
@@ -189,7 +190,7 @@ class GoogleSearch extends Component<IProps, IState> {
               and use it to search for images that match your criteria. When you are done copy and
               paste the URL from the browser below. Then give it a name and description.
             </Typography>
-            {this.state.loading ? (
+            {loadingGoogleSearches ? (
               <Loader size={50} left />
             ) : (
               <GoogleSearchForm onSubmit={this.toggleLoading} />

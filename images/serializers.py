@@ -4,6 +4,19 @@ from images import models
 from images.search import Search
 
 
+class ImageContainer(serializers.Serializer):
+    image_count = serializers.SerializerMethodField(read_only=True)
+    included_image_count = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_image_count(obj):
+        return obj.images.count()
+
+    @staticmethod
+    def get_included_image_count(obj):
+        return obj.images.filter(included=True).count()
+
+
 class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -18,12 +31,18 @@ class ImageGroupPostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'images')
 
 
-class ImageGroupSerializer(serializers.ModelSerializer):
+class ImageGroupListSerializer(ImageContainer, serializers.ModelSerializer):
 
     class Meta:
         model = models.ImageGroup
-        fields = ('id', 'name', 'description', 'images', 'owner',
-                  'groups',)
+        fields = ('id', 'name', 'description', 'owner', 'included_image_count', 'image_count', )
+
+
+class ImageGroupDetailSerializer(ImageContainer, serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ImageGroup
+        fields = ('id', 'name', 'description', 'images', 'owner', 'included_image_count', 'image_count')
 
 
 class MergeSerializer(serializers.Serializer):
@@ -43,15 +62,9 @@ class UploadEventSerializer(serializers.ModelSerializer):
         fields = ('id', 'images', 'owner', 'created', 'last_updated')
 
 
-class UploadEventListSerializer(serializers.ModelSerializer):
+class UploadEventListSerializer(serializers.ModelSerializer, ImageContainer):
     image_count = serializers.SerializerMethodField(read_only=True)
     included_image_count = serializers.SerializerMethodField(read_only=True)
-
-    def get_image_count(self, obj):
-        return obj.images.count()
-
-    def get_included_image_count(self, obj):
-        return obj.images.filter(included=True).count()
 
     class Meta:
         model = models.UploadEvent

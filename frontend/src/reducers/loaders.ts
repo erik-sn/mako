@@ -58,6 +58,7 @@ export default (state: ILoaderReducer = initialState, action: IAction<any>): ILo
     case types.GET_AUTH_TOKEN_FAILURE:
       return { ...state, login: false };
     case types.WEBSOCKET_GENERIC_ERROR:
+    case types.googleSearch.createFailure:
     case types.CREATE_GOOGLE_SEARCH_COMPLETE: {
       return { ...state, createGoogleSearch: false };
     }

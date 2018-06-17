@@ -50,9 +50,14 @@ class AsyncWebSocketConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, action=None):
         try:
-            handler_class = ASYNC_HANDLERS[action['type']]
-            handler = handler_class(self, action['type'], action['payload'])
+            action_type = action['type']
+            handler_class = ASYNC_HANDLERS[action_type]
+            handler = handler_class(self, action_type, action['payload'])
             user = self.scope['user']
+            if user.is_anonymous:
+                await self.send(types.UNAUTHENTICATED_USER_ERROR, 'user is not authenticated')
+                await self.send(f'{action_type}_FAILURE', 'user is not authenticated')
+                return
             await handler.process_action(user=user)
         except KeyError:
             await self.send(types.INVALID_ACTION_ERROR, 'input action must have a type and payload')

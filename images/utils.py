@@ -8,6 +8,7 @@ from typing import List
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
 from django.db.models import Model
+from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
 
 from images.models import Image, ImageGroup
@@ -20,7 +21,7 @@ if not os.path.exists(TEMP_IMAGES):
 SAVED_IMAGES = settings.SAVED_IMAGES
 
 
-def create_image_group(items: List[Model], serializer: ModelSerializer) -> ImageGroup:
+def create_image_group(items: List[Model], serializer: ModelSerializer, user: User) -> ImageGroup:
     """
     create and populate an image group
 
@@ -30,6 +31,8 @@ def create_image_group(items: List[Model], serializer: ModelSerializer) -> Image
         a list of models that have an images property
     serializer: ModelSerializer
         DRF seralizer that has been validated
+    user: django.contrib.auth.models
+        user who is creating this ImageGroup
 
     Returns
     -------
@@ -44,6 +47,7 @@ def create_image_group(items: List[Model], serializer: ModelSerializer) -> Image
     image_group = ImageGroup.objects.create(
         name=name,
         description=description,
+        owner=user,
     )
 
     all_included_images = []

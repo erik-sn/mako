@@ -24,6 +24,9 @@ function parseErrorKey(errorMessages: IDjangoErrors, key: string): string | stri
 }
 
 export const extractErrorMessages = (errorMessages: IDjangoErrors) => {
+  if (typeof errorMessages === 'string') {
+    return errorMessages;
+  }
   const keys = Object.keys(errorMessages);
   return keys.reduce((flatErrors: IMap<string | string[]>, key): IMap<string | string[]> => {
     if (GENERAL_ERROR_KEYS.find(errorKey => errorKey === key)) {

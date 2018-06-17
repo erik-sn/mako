@@ -2,6 +2,13 @@
 
 System to build, manage and deploy classifiers.
 
+## Get in contact & view progress
+
+- [Join Slack](https://join.slack.com/t/mako-app/shared_invite/enQtMzgyMDA5MjQ3NTY4LTAyOTk5NDI0ZDYzYjhmYzY5YmM1NmU3NDljYWI0OThiNzkwOTAxZjI5ZTA4YzIzNjcyNTYzNmNlNzkyYWQ1ODc)
+- [Trello feature board](https://trello.com/b/sFrWSZjs/features)
+- [Trello development board](https://trello.com/b/APQNIYqL/development)
+    
+
 ## Target feature set
 
 - User authentication through registration, or OAuth2 through google & github
@@ -49,8 +56,20 @@ npm run dev
 ```
 
 
+### Contributing
+
+Join & ask in slack! General guidelines:
+
+1. All work is subject to reviews before merge
+2. Work in feature branches
+3. Rebase your branch on top of master, we will try to maintain a clean git history
+4. Utilize linters & styling tools. TSlint & Prettier for the frontend, PEP8 for Python
+
+
 ### Technologies
 
 - Backend API: Django, DRF, Postgres, Redis, Celery
 - Frontend: React, Redux, TypeScript
 - ML: Pytorch
+
+

@@ -76,6 +76,8 @@ class Api {
   // image groups
   public createImageGroup = (json: IMap<any>): AxiosPromise =>
     axios.post(`${this.base}/imagegroups/`, json);
+
+  public fetchImageGroups = (): AxiosPromise => axios.get(`${this.base}/image_groups/`);
 }
 
 export default new Api(API);

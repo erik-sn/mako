@@ -11,7 +11,8 @@ from rest_framework import status
 from images.utils import unzip_and_save_files, check_if_gz_file, create_image_group
 from images.serializers import (
     ImageSerializer,
-    ImageGroupSerializer,
+    ImageGroupDetailSerializer,
+    ImageGroupListSerializer,
     ImageGroupPostSerializer,
     MergeSerializer,
     UploadEventSerializer,
@@ -80,11 +81,13 @@ class ImageGroupViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self) -> ModelSerializer:
         if self.request.method in ['GET']:
-            return ImageGroupSerializer
+            return ImageGroupDetailSerializer
         return ImageGroupPostSerializer
 
     def list(self, request, **kwargs) -> Response:
-        return Response(status=405)
+        image_groups = self.queryset.filter(owner=request.user)
+        serializer = ImageGroupListSerializer(image_groups, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UploadEventViewSet(viewsets.ModelViewSet):
@@ -111,7 +114,7 @@ class UploadEventViewSet(viewsets.ModelViewSet):
 
             try:
                 upload_events = [UploadEvent.objects.get(id=id) for id in upload_event_ids]
-                image_group = create_image_group(upload_events, serializer)
+                image_group = create_image_group(upload_events, serializer, request.user)
             except UploadEvent.DoesNotExist:
                 return Response({
                     'generic': ['Could not find one of the selected google searches - contact an administrator']
