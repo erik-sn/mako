@@ -41,20 +41,26 @@ on either feedback thresholds, time intervals, or on the owner's instruction
     
 2. Start API server:
 
-In the root directory:
+Fill out the `.env.template` file with variables and then copy it as `.env`
+in the root directory - this file is git ignored.
+
+Then In the root directory:
 ```bash
 docker-compose up
 ```
 
+browse to http://localhost:8000/api/v1/
+
 3. Start node server:
 
-Starting in the root directory:
+Starting in the root directory in a new terminal:
 ```bash
 cd frontend
 npm i
 npm run dev
 ```
 
+and browse to http://localhost:3000
 
 ### Contributing
 
