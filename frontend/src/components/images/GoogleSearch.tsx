@@ -197,7 +197,11 @@ class GoogleSearch extends Component<IProps, IState> {
             )}
             <pre>{websocketLog}</pre>
             <Typography>
-              <Link to={`/images/google/${googleSearchId}/`}>View results of google image parse</Link>
+              {googleSearchId && (
+                <Link to={`/images/google/${googleSearchId}/`}>
+                  View results of google image parse
+                </Link>
+              )}
             </Typography>
           </ExpansionPanelDetails>
         </ExpansionPanel>
