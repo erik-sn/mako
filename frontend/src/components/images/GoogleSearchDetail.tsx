@@ -10,16 +10,15 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import { AxiosResponse, AxiosError } from 'axios';
 
 import api from '@/utils/api';
-import { resetLastCreatedId } from '@/actions/display';
-import { resetWebsocketLog } from '@/actions/google';
 import GoogleSearch, { IImage } from '@/models/GoogleSearch';
 import Loader from '@/components/generic/Loader';
 import Dialog from '@/components/generic/Dialog';
-import { IStore } from '@/interfaces/redux';
-import Grid from '@/components/generic/Grid';
-import Panel from './Panel';
+import ImageList from './ImageList';
 
 const styles = withStyles<any>((theme: any) => ({
+  button: {
+    margin: theme.spacing.unit,
+  },
   root: {
     flexGrow: 1,
   },
@@ -31,15 +30,15 @@ const styles = withStyles<any>((theme: any) => ({
     padding: '8px 24px',
     wordBreak: 'break-word',
   },
-  grid: {
+  images: {
     width: '100%',
+    display: 'flex',
+    flexFlow: 'row wrap',
   },
 }));
 
 interface IProps {
   getDetail: (id: number) => void;
-  resetLastCreatedId: () => void;
-  resetWebsocketLog: () => void;
   match: {
     params: {
       redirect?: string;
@@ -54,6 +53,7 @@ interface IState {
   search: GoogleSearch;
   error: AxiosError;
   height: number;
+  visibleImages: number,
 }
 
 class GoogleSearchDetail extends Component<IProps, IState> {
@@ -61,10 +61,10 @@ class GoogleSearchDetail extends Component<IProps, IState> {
     search: undefined,
     error: undefined,
     height: undefined,
+    visibleImages: 19,
   };
 
   public componentDidMount(): void {
-    this.props.resetLastCreatedId();
     const { id } = this.props.match.params;
     api
       .retrieveGoogleSearch(id)
@@ -76,13 +76,14 @@ class GoogleSearchDetail extends Component<IProps, IState> {
       });
   }
 
-  public componentWillUnmount(): void {
-    this.props.resetWebsocketLog();
+  private showMoreImages = (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    this.setState({ visibleImages: this.state.visibleImages + 10 });
   }
 
   public render(): JSX.Element {
-    const { classes, websocketLog, match } = this.props;
-    const { search, error } = this.state;
+    const { classes, match } = this.props;
+    const { search, error, visibleImages } = this.state;
     if (error) {
       return (
         <Dialog
@@ -136,33 +137,18 @@ class GoogleSearchDetail extends Component<IProps, IState> {
             <Typography className={classes.heading}>Log</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={`${classes.details} ${classes.panel}`}>
-            <pre>{websocketLog || log}</pre>
+            <pre>{log}</pre>
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <ExpansionPanel className={classes.panel} defaultExpanded={!redirected}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className={classes.heading}>Images</Typography>
           </ExpansionPanelSummary>
-          <Grid
-            elementHeight={250}
-            elementWidth={170}
-            containerHeight={600}
-            className={classes.grid}
-          >
-            {images.map(image => <Panel key={image.name} image={image} />)}
-          </Grid>
+          <ImageList images={images} />
         </ExpansionPanel>
       </React.Fragment>
     );
   }
 }
 
-const mapStateToProps = (state: IStore, ownProps: IProps) => {
-  return {
-    websocketLog: ownProps.match.params.redirect ? state.google.websocketLog : null,
-  };
-};
-
-export default styles<any>(
-  connect<any>(mapStateToProps, { resetLastCreatedId, resetWebsocketLog })(GoogleSearchDetail),
-);
+export default styles<any>(GoogleSearchDetail);

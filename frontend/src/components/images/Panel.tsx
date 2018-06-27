@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -53,7 +53,7 @@ import { STATIC } from '../../sagas/types';
 import Tooltip from '@material-ui/core/Tooltip';
 import { AxiosResponse } from 'axios';
 
-class Panel extends PureComponent<IProps, IState> {
+class Panel extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -64,6 +64,10 @@ class Panel extends PureComponent<IProps, IState> {
       toggleTooltip: false,
       toggleError: false,
     };
+  }
+
+  public shouldComponentUpdate(nextProps: IProps): boolean {
+    return nextProps.image.sourceUrl !== this.props.image.sourceUrl;
   }
 
   private toggleDialog = (e: React.MouseEvent<HTMLButtonElement>) => {

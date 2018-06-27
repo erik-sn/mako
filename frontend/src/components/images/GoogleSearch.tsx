@@ -7,11 +7,11 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withStyles } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar';
-import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 
+import { resetLastCreatedId } from '@/actions/display';
+import { resetWebsocketLog } from '@/actions/google';
 import api from '@/utils/api';
-import Drawer from '@/components/generic/card/Drawer';
 import GoogleSearchForm from '@/components/forms/GoogleSearchForm';
 import Loader from '@/components/generic/Loader';
 import { IStore } from 'src/interfaces/redux';
@@ -42,13 +42,16 @@ const styles = withStyles<any>(() => ({
 
 interface IProps {
   classes: any;
-  googleSearchId: number;
   loading: boolean;
   mergeLoading: boolean;
   mergeError: string;
   history: {
     push: (url: string) => void;
   };
+  googleSearchId: number;
+  websocketLog: string;
+  resetLastCreatedId: () => void;
+  resetWebsocketLog: () => void;
 }
 
 interface IState {
@@ -93,17 +96,17 @@ class GoogleSearch extends Component<IProps, IState> {
   }
 
   public componentWillReceiveProps(nextProps: IProps): void {
-    // we made a new google image search - redirect to it
-    if (nextProps.loading && nextProps.googleSearchId) {
-      this.props.history.push(`/images/google/${nextProps.googleSearchId}/redirect/`);
-    }
-
     // we succesfully made a google search merge
     if (this.props.mergeLoading && !nextProps.mergeLoading && !nextProps.mergeError) {
       this.setState({ searchesToMerge: [], mergeSuccess: true }, () => {
         this.retrieveGoogleSearches();
       });
     }
+  }
+
+  public componentWillUnmount() {
+    this.props.resetLastCreatedId();
+    this.props.resetWebsocketLog();
   }
 
   private retrieveGoogleSearches = () => {
@@ -167,13 +170,10 @@ class GoogleSearch extends Component<IProps, IState> {
   public render(): JSX.Element {
     const {
       googleSearches,
-      deleteAfterMerge,
       searchesToMerge,
       loadingGoogleSearches,
-      loading,
-      mergeSuccess,
     } = this.state;
-    const { classes } = this.props;
+    const { classes, websocketLog, googleSearchId } = this.props;
     const noExistingSearches = !loadingGoogleSearches && googleSearches.length === 0;
     return (
       <React.Fragment>
@@ -195,6 +195,10 @@ class GoogleSearch extends Component<IProps, IState> {
             ) : (
               <GoogleSearchForm onSubmit={this.toggleLoading} />
             )}
+            <pre>{websocketLog}</pre>
+            <Typography>
+              <Link to={`/images/google/${googleSearchId}/`}>View results of google image parse</Link>
+            </Typography>
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <ExpansionPanel defaultExpanded={true} expanded={true}>
@@ -270,10 +274,14 @@ class GoogleSearch extends Component<IProps, IState> {
 }
 
 const mapStateToProps = (state: IStore) => ({
+  websocketLog: state.google.websocketLog,
   googleSearchId: state.display.lastCreatedId,
   loading: state.loaders.createGoogleSearch,
   mergeLoading: state.loaders.mergeGoogleSearches,
   mergeError: state.errors.mergeSearchForm,
 });
 
-export default styles<any>(withRouter<any>(connect<any>(mapStateToProps)(GoogleSearch)));
+export default styles<any>(withRouter<any>(connect<any>(mapStateToProps, {
+  resetLastCreatedId,
+  resetWebsocketLog,
+})(GoogleSearch)));
