@@ -88,7 +88,7 @@ class GoogleSearchItem extends Component<IProps, IState> {
 
   private handleDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log(this.props.googleSearch.id, this.props.googleSearch.imageCount);
+    this.props.googleSearch.downloadImages();
   }
 
   private handleCheck = () => {

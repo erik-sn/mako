@@ -1,6 +1,9 @@
+from datetime import datetime
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django import forms
 from django.db.utils import IntegrityError
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from rest_framework import viewsets
@@ -124,7 +127,7 @@ class UploadEventViewSet(viewsets.ModelViewSet):
                     'name': ['Image group with this name already exists']
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(ImageGroupSerializer(image_group).data, status=201)
+            return Response(ImageGroupDetailSerializer(image_group).data, status=201)
 
     def create(self, request, *args, **kwargs):
         form: UploadFileForm = UploadFileForm(request.POST, request.FILES)
@@ -157,6 +160,17 @@ class SearchViewset(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
+    @detail_route(methods=['get'])
+    def download_images(self, request, pk: int) -> HttpResponse:
+        google_search = get_object_or_404(Search, pk=pk)
+        zip_file = google_search.collect_images()
+
+        timestamp = datetime.now().strftime('%y-%m-%d_%H%M')
+        response = HttpResponse(zip_file, content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename={google_search.name}-images-{timestamp}.zip'
+        return response
+
+
     @list_route(methods=['post'])
     def merge(self, request) -> Response:
         serializer = MergeSerializer(data=request.data)
@@ -175,7 +189,7 @@ class SearchViewset(viewsets.ModelViewSet):
                     'name': ['Image group with this name already exists']
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(ImageGroupSerializer(image_group).data, status=201)
+            return Response(ImageGroupDetailSerializer(image_group).data, status=201)
 
     def create(self, request, *args, **kwargs):
         # serializer = self.get_serializer(data=request.data)

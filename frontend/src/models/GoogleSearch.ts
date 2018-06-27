@@ -1,4 +1,7 @@
 import { DateTime } from 'luxon';
+import { AxiosPromise } from 'axios';
+
+import api from '@/utils/api';
 
 export interface IImage {
   name: string;
@@ -57,6 +60,10 @@ class GoogleSearch {
     this.createdStr = this.created.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
     this.lastUpdated = DateTime.fromISO(lastUpdated);
     this.lastUpdatedStr = this.lastUpdated.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
+  }
+
+  public downloadImages(): AxiosPromise {
+    return api.downloadSearchImages(this.id);
   }
 }
 

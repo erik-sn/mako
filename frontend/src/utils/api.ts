@@ -58,6 +58,9 @@ class Api {
   public mergeSearches = (json: IMap<any>) =>
     axios.post(`${this.base}/google_searches/merge/`, json);
 
+  public downloadSearchImages = (id: number) =>
+    axios.get(`${this.base}/google_searches/55/download_images/`);
+
   // upload events
   public fetchUploadEvents = (): AxiosPromise => axios.get(`${this.base}/upload_events/`);
 

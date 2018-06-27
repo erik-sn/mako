@@ -4,6 +4,7 @@ import os
 from urllib.parse import urlparse, parse_qs
 import hashlib
 import asyncio
+import zipfile
 from concurrent.futures._base import TimeoutError, CancelledError
 from mimetypes import guess_all_extensions
 import uuid
@@ -68,6 +69,21 @@ class Search(Base):
 
     # websocket connection passed when processing begins
     connection = None
+
+    def collect_images(self) -> zipfile.ZipFile:
+        """
+        retrieve all images in this search and save them to a .zip file
+        """
+        file_paths = [i.file_path for i in self.images.all()]
+        zip_file = zipfile.ZipFile(f'{uuid.uuid4()}.zip', 'w')
+        for file_path in file_paths:
+            try:
+                zip_file.write(os.path.basename(file_path), compress_type=zipfile.ZIP_DEFLATED)
+            except FileNotFoundError:
+                print(f'missing image {file_path}')
+                continue
+
+        return zip_file
 
     async def generate_page_source(self):
         options = webdriver.ChromeOptions()

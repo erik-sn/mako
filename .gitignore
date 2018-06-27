@@ -3,6 +3,7 @@
 
 ;; other
 *.pyc
+*.zip
 
 ;; client side
 x*.min*
