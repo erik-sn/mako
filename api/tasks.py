@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from config.celery import app
+from mako.celery import app
 from shutil import rmtree
 import traceback
 

@@ -1,4 +1,8 @@
 #!/bin/sh
+
+echo "Waiting for database to spin up"
+sleep 5
+
 # Collect static files
 echo "Collect static files"
 python manage.py collectstatic --noinput

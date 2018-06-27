@@ -26,7 +26,7 @@ if not os.path.exists(PICKLE_DIR):
 # Application definition
 INSTALLED_APPS = [
     # custom apps
-    'config',
+    'mako',
     'api',
     'training',
     'images',
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'mako.urls'
 
 TEMPLATES = [
     {
@@ -86,7 +86,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'mako.wsgi.application'
 
 
 # Database
@@ -103,7 +103,7 @@ DATABASES = {
     }
 }
 
-ASGI_APPLICATION = "config.routing.application"
+ASGI_APPLICATION = "mako.routing.application"
 
 CHANNEL_LAYERS = {
     "default": {

@@ -1,5 +1,7 @@
 #!/bin/sh
 
-# Start server
+echo "Wait for app to start"
+sleep 10
+
 echo "Starting celery services"
-celery flower -A config.celery --port=5555 & celery -A config.celery beat -l warning & celery worker -A config.celery -l warning && fg
+flower -A mako.celery --port=5555 & celery -A mako.celery beat -l warning & celery worker -A mako.celery -l warning && fg
