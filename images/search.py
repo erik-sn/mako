@@ -1,6 +1,8 @@
 import time
 import pickle
 import os
+import io
+import logging
 from urllib.parse import urlparse, parse_qs
 import hashlib
 import asyncio
@@ -27,6 +29,7 @@ from api import types
 from api.models import Base
 from images.models import Image
 
+logger = logging.getLogger('django')
 ua = FakeUserAgent()
 
 SavedImage = namedtuple('SavedImage', 'file_name file_path source_url img_buffer')
@@ -70,20 +73,21 @@ class Search(Base):
     # websocket connection passed when processing begins
     connection = None
 
-    def collect_images(self) -> zipfile.ZipFile:
+    def collect_images(self) -> io.BytesIO:
         """
         retrieve all images in this search and save them to a .zip file
         """
-        file_paths = [i.file_path for i in self.images.all()]
-        zip_file = zipfile.ZipFile(f'{uuid.uuid4()}.zip', 'w')
-        for file_path in file_paths:
-            try:
-                zip_file.write(os.path.basename(file_path), compress_type=zipfile.ZIP_DEFLATED)
-            except FileNotFoundError:
-                print(f'missing image {file_path}')
-                continue
 
-        return zip_file
+        file_paths = [i.file_path for i in self.images.all()]
+        zip_io = io.BytesIO()
+        with zipfile.ZipFile(zip_io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip_file:
+            for file_path in file_paths:
+                try:
+                    zip_file.write(file_path, arcname=os.path.basename(file_path))
+                except FileNotFoundError:
+                    logger.warning(f'missing image {file_path}')
+                    continue
+        return zip_io
 
     async def generate_page_source(self):
         options = webdriver.ChromeOptions()

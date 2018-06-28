@@ -14,6 +14,8 @@ import GoogleSearch, { IImage } from '@/models/GoogleSearch';
 import Loader from '@/components/generic/Loader';
 import Dialog from '@/components/generic/Dialog';
 import ImageList from './ImageList';
+import ImageDownloader from './ImageDownloader';
+import DownloadIcon from '@material-ui/icons/CloudDownload';
 
 const styles = withStyles<any>((theme: any) => ({
   button: {
@@ -35,6 +37,11 @@ const styles = withStyles<any>((theme: any) => ({
     display: 'flex',
     flexFlow: 'row wrap',
   },
+  downloadIcon: {
+    position: 'absolute',
+    top: '10px',
+    left: '80px',
+  },
 }));
 
 interface IProps {
@@ -53,7 +60,7 @@ interface IState {
   search: GoogleSearch;
   error: AxiosError;
   height: number;
-  visibleImages: number,
+  imagesExpanded: boolean;
 }
 
 class GoogleSearchDetail extends Component<IProps, IState> {
@@ -61,7 +68,7 @@ class GoogleSearchDetail extends Component<IProps, IState> {
     search: undefined,
     error: undefined,
     height: undefined,
-    visibleImages: 19,
+    imagesExpanded: true,
   };
 
   public componentDidMount(): void {
@@ -76,14 +83,14 @@ class GoogleSearchDetail extends Component<IProps, IState> {
       });
   }
 
-  private showMoreImages = (e: React.FormEvent<HTMLButtonElement>) => {
+  private toggleShowImagePanel = (e: React.ChangeEvent<{}>, expanded: boolean) => {
     e.preventDefault();
-    this.setState({ visibleImages: this.state.visibleImages + 10 });
+    this.setState({ imagesExpanded: expanded });
   }
 
   public render(): JSX.Element {
     const { classes, match } = this.props;
-    const { search, error, visibleImages } = this.state;
+    const { search, error, imagesExpanded } = this.state;
     if (error) {
       return (
         <Dialog
@@ -140,10 +147,15 @@ class GoogleSearchDetail extends Component<IProps, IState> {
             <pre>{log}</pre>
           </ExpansionPanelDetails>
         </ExpansionPanel>
-        <ExpansionPanel className={classes.panel} defaultExpanded={!redirected}>
+        <ExpansionPanel className={classes.panel} defaultExpanded={!redirected} onChange={this.toggleShowImagePanel} >
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className={classes.heading}>Images</Typography>
           </ExpansionPanelSummary>
+          {imagesExpanded && (
+            <div className={classes.downloadIcon}>
+              <ImageDownloader model={search} />
+            </div>
+          )}
           <ImageList images={images} />
         </ExpansionPanel>
       </React.Fragment>

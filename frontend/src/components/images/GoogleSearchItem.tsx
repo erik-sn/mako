@@ -12,6 +12,7 @@ import GoogleSearch from '../../models/GoogleSearch';
 import InlineError from '@/components/generic/InlineError';
 import api from '@/utils/api';
 import Tooltip from '@material-ui/core/Tooltip';
+import ImageDownloader from './ImageDownloader';
 
 const styles = withStyles<any>((theme: any) => ({
   details: {
@@ -86,11 +87,6 @@ class GoogleSearchItem extends Component<IProps, IState> {
       });
   };
 
-  private handleDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.props.googleSearch.downloadImages();
-  }
-
   private handleCheck = () => {
     this.props.addSearchToMerge(this.props.googleSearch.id);
   };
@@ -113,21 +109,7 @@ class GoogleSearchItem extends Component<IProps, IState> {
           <Typography className={classes.created} variant="body1">
             {googleSearch.createdStr}
           </Typography>
-          {downloadError ? (
-            <InlineError
-              text="Error downloading images"
-              style={{ justifyContent: 'flex-end' }}
-            />
-          ) : (
-            <Tooltip id="tooltip-download" title={`Download ${googleSearch.imageCount} images`}>
-              <IconButton
-                onClick={this.handleDownload}
-                aria-label="Download images"
-              >
-                <DownloadIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          <ImageDownloader model={googleSearch} />
           {deleteError ? (
             <InlineError
               text="Error deleting google search"

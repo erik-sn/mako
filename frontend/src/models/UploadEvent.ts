@@ -31,6 +31,10 @@ class UploadEvent {
     this.lastUpdated = DateTime.fromISO(lastUpdated);
     this.lastUpdatedStr = this.lastUpdated.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
   }
+
+  public downloadImages(): void {
+    console.log('download event');
+  }
 }
 
 export default UploadEvent;

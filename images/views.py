@@ -1,4 +1,6 @@
 from datetime import datetime
+import logging
+import io
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django import forms
 from django.db.utils import IntegrityError
@@ -29,6 +31,9 @@ from images.models import (
     UploadEvent,
 )
 from images.search import Search
+
+
+logger = logging.getLogger('django')
 
 
 class UploadFileForm(forms.Form):
@@ -163,13 +168,13 @@ class SearchViewset(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def download_images(self, request, pk: int) -> HttpResponse:
         google_search = get_object_or_404(Search, pk=pk)
-        zip_file = google_search.collect_images()
+        zip_io = google_search.collect_images()
 
-        timestamp = datetime.now().strftime('%y-%m-%d_%H%M')
-        response = HttpResponse(zip_file, content_type='application/zip')
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H.%M')
+        response = HttpResponse(zip_io.getvalue(), content_type='application/x-zip-compressed')
         response['Content-Disposition'] = f'attachment; filename={google_search.name}-images-{timestamp}.zip'
+        response['Content-Length'] = zip_io.tell()
         return response
-
 
     @list_route(methods=['post'])
     def merge(self, request) -> Response:
