@@ -184,7 +184,7 @@ class SearchViewset(viewsets.ModelViewSet):
 
             try:
                 searches = [Search.objects.get(id=id) for id in search_ids]
-                image_group = create_image_group(searches, serializer)
+                image_group = create_image_group(searches, serializer, request.user)
             except Search.DoesNotExist:
                 return Response({
                     'generic': ['Could not find one of the selected google searches - contact an administrator']

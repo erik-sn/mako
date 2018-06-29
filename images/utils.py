@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
 from django.db.models import Model
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import Serializer
 
 from images.models import Image, ImageGroup
 
@@ -21,7 +21,7 @@ if not os.path.exists(TEMP_IMAGES):
 SAVED_IMAGES = settings.SAVED_IMAGES
 
 
-def create_image_group(items: List[Model], serializer: ModelSerializer, user: User) -> ImageGroup:
+def create_image_group(items: List[Model], serializer: Serializer, user: User) -> ImageGroup:
     """
     create and populate an image group
 
