@@ -66,9 +66,9 @@ class Panel extends Component<IProps, IState> {
     };
   }
 
-  public shouldComponentUpdate(nextProps: IProps): boolean {
-    return nextProps.image.sourceUrl !== this.props.image.sourceUrl;
-  }
+  // public shouldComponentUpdate(nextProps: IProps): boolean {
+  //   return nextProps.image.sourceUrl !== this.props.image.sourceUrl;
+  // }
 
   private toggleDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -80,17 +80,13 @@ class Panel extends Component<IProps, IState> {
   };
 
   private copyToClipboard = () => {
-    const { name } = this.props.image;
-    const input = document.getElementById(name) as any;
-    input.focus();
+    const { sourceUrl } = this.props.image;
+    const input = document.createElement('input');
+    input.setAttribute('value', sourceUrl);
+    document.body.appendChild(input);
     input.select();
-
-    try {
-      document.execCommand('copy');
-      this.setState({ copyTooltip: true });
-    } catch (err) {
-      this.setState({ copyError: true });
-    }
+    const result = document.execCommand('copy');
+    document.body.removeChild(input);
   };
 
   private toggleImageActive = (e: React.MouseEvent<HTMLButtonElement>) => {
