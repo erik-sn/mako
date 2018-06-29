@@ -32,8 +32,8 @@ class UploadEvent {
     this.lastUpdatedStr = this.lastUpdated.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
   }
 
-  public downloadImages(): void {
-    console.log('download event');
+  public downloadImages(): Promise<void> {
+    return new Promise(() => null);
   }
 }
 

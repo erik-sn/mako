@@ -62,7 +62,7 @@ class GoogleSearch {
     this.lastUpdatedStr = this.lastUpdated.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
   }
 
-  public downloadImages(): Promise<void> {
+  public downloadImages(): void {
     return api.downloadSearchImages(this.id);
   }
 }
