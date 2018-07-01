@@ -35,7 +35,7 @@ class ImageGroupListSerializer(ImageContainer, serializers.ModelSerializer):
 
     class Meta:
         model = models.ImageGroup
-        fields = ('id', 'name', 'description', 'owner', 'included_image_count', 'image_count', )
+        fields = ('id', 'name', 'description', 'owner', 'included_image_count', 'image_count', 'created', 'last_updated')
 
 
 class ImageGroupDetailSerializer(ImageContainer, serializers.ModelSerializer):

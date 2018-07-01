@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,6 +10,7 @@ from api.serializers import LoginRecordSerializer
 from api.utils import get_client_ip
 
 
+logger = logging.getLogger('django')
 LOGIN_LIST_COUNT = 10
 
 
@@ -73,6 +75,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         response = super(MyTokenObtainPairView, self).post(request, *args, **kwargs)
+        logger.info(request.user)
+        logger.info(response.data)
+        logger.info(request)
         create_login_event(response.data, request)
         return response
 
@@ -82,5 +87,6 @@ class MyTokenRefreshView(TokenRefreshView):
 
     def post(self, request, *args, **kwargs):
         response = super(MyTokenRefreshView, self).post(request, *args, **kwargs)
+
         create_login_event(response.data, request)
         return response

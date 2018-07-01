@@ -1,9 +1,11 @@
 import hashlib
 import os
 import tarfile
+import zipfile
 from shutil import copyfile, rmtree
 import uuid
 import gzip
+import logging
 from typing import List
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
@@ -12,6 +14,9 @@ from django.contrib.auth.models import User
 from rest_framework.serializers import Serializer
 
 from images.models import Image, ImageGroup
+
+
+logger = logging.getLogger('django')
 
 
 TEMP_IMAGES = os.path.join(settings.TEMP_IMAGES, 'extracted_temp')
@@ -67,8 +72,8 @@ def create_image_group(items: List[Model], serializer: Serializer, user: User) -
     return image_group
 
 
-def check_if_gz_file(file: InMemoryUploadedFile) -> bool:
-    """ determine if input is a gzip file
+def assert_compressed_file(file: InMemoryUploadedFile) -> bool:
+    """ determine if input is a compressed file
 
     Parameters
     ----------
@@ -78,15 +83,18 @@ def check_if_gz_file(file: InMemoryUploadedFile) -> bool:
     Returns
     -------
     bool
-        True if the file is a gzip file, False otherwise
+        True if the file is a zip or gzip file, False otherwise
 
     """
-    if not file.name.endswith('.gz'):
-        return False
-
     try:
-        with gzip.open(file, 'rb') as f:
-            f.read()
+        with gzip.open(file, 'rb') as gzip_file:
+            gzip_file.read()
+        return True
+    except OSError:
+        pass
+    try:
+        with zipfile.ZipFile(file, 'r') as zip_file:
+            zip_file.testzip()
         return True
     except OSError:
         return False
@@ -120,14 +128,13 @@ def extract_contents(file_path: str) -> None:
     file_path : str
         file path of the gzip directory to be extracted
     """
-    if file_path.endswith("tar.gz"):
-        tar = tarfile.open(file_path, "r:gz")
-        tar.extractall(path=TEMP_IMAGES)
-        tar.close()
-    elif file_path.endswith("tar"):
-        tar = tarfile.open(file_path, "r:")
-        tar.extractall(path=TEMP_IMAGES)
-        tar.close()
+    if tarfile.is_tarfile(file_path):
+        with tarfile.open(file_path, "r:*") as tar_file:
+            tar_file.extractall(path=TEMP_IMAGES)
+
+    elif zipfile.is_zipfile(file_path):
+        with zipfile.ZipFile(file_path, 'r') as zip_file:
+            zip_file.extractall(path=TEMP_IMAGES)
 
 
 def is_image_file(file_name: str) -> bool:

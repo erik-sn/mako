@@ -27,7 +27,7 @@ from fake_useragent import FakeUserAgent
 
 from api import types
 from api.models import Base
-from images.models import Image
+from images.models import Image, ImageContainer
 
 logger = logging.getLogger('django')
 ua = FakeUserAgent()
@@ -58,7 +58,7 @@ Failed image saves: {1}
 """
 
 
-class Search(Base):
+class Search(Base, ImageContainer):
     url = models.TextField()
     description = models.TextField(blank=True, default='')
     failures = ArrayField(models.TextField(), null=True)
@@ -72,22 +72,6 @@ class Search(Base):
 
     # websocket connection passed when processing begins
     connection = None
-
-    def collect_images(self) -> io.BytesIO:
-        """
-        retrieve all images in this search and save them to a .zip file
-        """
-
-        file_paths = [i.file_path for i in self.images.all()]
-        zip_io = io.BytesIO()
-        with zipfile.ZipFile(zip_io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip_file:
-            for file_path in file_paths:
-                try:
-                    zip_file.write(file_path, arcname=os.path.basename(file_path))
-                except FileNotFoundError:
-                    logger.warning(f'missing image {file_path}')
-                    continue
-        return zip_io
 
     async def generate_page_source(self):
         options = webdriver.ChromeOptions()

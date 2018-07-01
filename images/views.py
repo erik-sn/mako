@@ -1,6 +1,5 @@
 from datetime import datetime
 import logging
-import io
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django import forms
 from django.db.utils import IntegrityError
@@ -13,7 +12,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.serializers import ModelSerializer
 from rest_framework import status
 
-from images.utils import unzip_and_save_files, check_if_gz_file, create_image_group
+from images.utils import unzip_and_save_files, assert_compressed_file, create_image_group
 from images.serializers import (
     ImageSerializer,
     ImageGroupDetailSerializer,
@@ -38,6 +37,15 @@ logger = logging.getLogger('django')
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
+
+
+class ImageContainerView:
+    model_class = None
+
+    @detail_route(methods=['get'])
+    def download_images(self, request, pk: int) -> HttpResponse:
+        image_container = get_object_or_404(self.model_class, pk=pk)
+        return image_container.build_download_response()
 
 
 class ImageViewSet(viewsets.ReadOnlyModelViewSet):
@@ -81,11 +89,12 @@ class ImageViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ImageGroupViewSet(viewsets.ModelViewSet):
+class ImageGroupViewSet(viewsets.ModelViewSet, ImageContainerView):
     """
     Image Group viewset
     """
-    queryset = ImageGroup.objects.all()
+    model_class = ImageGroup
+    queryset = model_class.objects.all()
 
     def get_serializer_class(self) -> ModelSerializer:
         if self.request.method in ['GET']:
@@ -93,18 +102,23 @@ class ImageGroupViewSet(viewsets.ModelViewSet):
         return ImageGroupPostSerializer
 
     def list(self, request, **kwargs) -> Response:
+        # TODO see if we can make this filter generic
         image_groups = self.queryset.filter(owner=request.user)
         serializer = ImageGroupListSerializer(image_groups, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def create(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class UploadEventViewSet(viewsets.ModelViewSet):
+
+class UploadEventViewSet(viewsets.ModelViewSet, ImageContainerView):
     """
     view to handle uploading of single, multiple or gzipped
     images
     """
-    queryset = UploadEvent.objects.all()
     serializer_class = UploadEventSerializer
+    model_class = UploadEvent
+    queryset = model_class.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -138,10 +152,11 @@ class UploadEventViewSet(viewsets.ModelViewSet):
         form: UploadFileForm = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file: InMemoryUploadedFile = request.FILES['file']
-            if not check_if_gz_file(file):
-                return Response('Invalid file type - .gz required', 400)
-
+            if not assert_compressed_file(file):
+                return Response('Invalid file type', 400)
+            logger.info(file)
             saved_images, new_image_count = unzip_and_save_files(file)
+            logger.info(saved_images)
             upload_event = UploadEvent.objects.create(owner=request.user)
             upload_event.images.set(saved_images)
             upload_event.save()
@@ -154,8 +169,9 @@ class UploadEventViewSet(viewsets.ModelViewSet):
         return Response(form.errors, status=400)
 
 
-class SearchViewset(viewsets.ModelViewSet):
-    queryset = Search.objects.all()
+class SearchViewset(viewsets.ModelViewSet, ImageContainerView):
+    model_class = Search
+    queryset = model_class.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -164,17 +180,6 @@ class SearchViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
-
-    @detail_route(methods=['get'])
-    def download_images(self, request, pk: int) -> HttpResponse:
-        google_search = get_object_or_404(Search, pk=pk)
-        zip_io = google_search.collect_images()
-
-        timestamp = datetime.now().strftime('%Y-%m-%d_%H.%M')
-        response = HttpResponse(zip_io.getvalue(), content_type='application/x-zip-compressed')
-        response['Content-Disposition'] = f'attachment; filename={google_search.name}-images-{timestamp}.zip'
-        response['Content-Length'] = zip_io.tell()
-        return response
 
     @list_route(methods=['post'])
     def merge(self, request) -> Response:
@@ -195,13 +200,3 @@ class SearchViewset(viewsets.ModelViewSet):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(ImageGroupDetailSerializer(image_group).data, status=201)
-
-    def create(self, request, *args, **kwargs):
-        # serializer = self.get_serializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
-        #
-        # search = serializer.save()
-        # # args = Argument(serializer.validated_data['url'])
-        # # self._analyze_google_image_search(search, args)
-
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

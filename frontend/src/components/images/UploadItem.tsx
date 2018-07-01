@@ -16,6 +16,7 @@ import UploadEvent from '@/models/UploadEvent';
 import api from '@/utils/api';
 import InlineError from '@/components/generic/InlineError';
 import Loader from '@/components/generic/Loader';
+import ImageDownloader from '@/components/images/ImageDownloader';
 
 const styles = withStyles<any>((theme: any) => ({
   details: {
@@ -125,6 +126,7 @@ class UploadItem extends Component<IProps, {}> {
               <Typography className={classes.created} variant="body1">
                 {upload.createdStr}
               </Typography>
+              <ImageDownloader model={upload} />
               {loading ? (
                 <Loader size={25} marginTop="0px" marginLeft="15px" />
               ) : (
