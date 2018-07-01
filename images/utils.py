@@ -15,6 +15,7 @@ from django.db.models import Model
 from django.contrib.auth.models import User
 from rest_framework.serializers import Serializer
 
+from mako.models import ImageConfig
 from images.models import Image, ImageGroup
 
 
@@ -145,7 +146,7 @@ def extract_contents(file_path: str) -> None:
             zip_file.extractall(path=TEMP_IMAGES)
 
 
-def is_image_file(file_path: str) -> bool:
+def is_image_file(valid_file_types: List[str], file_path: str) -> bool:
     """
 
     Parameters
@@ -159,13 +160,13 @@ def is_image_file(file_path: str) -> bool:
         if the file name has an image extension
     """
     file_type = imghdr.what(file_path)
-    valid_image = file_type in ['jpg', 'jpeg', 'png']
+    valid_image = file_type in valid_file_types
     if not valid_image:
         logger.warning(f'Ignoring for incorrect image type: {file_type} - {file_path}')
     return valid_image
 
 
-def process_images() -> List[Tuple[str, str]]:
+def process_images(valid_file_types: List[str]) -> List[Tuple[str, str]]:
     """Find all files in the temp directory that are image files
     Returns
     -------
@@ -175,7 +176,7 @@ def process_images() -> List[Tuple[str, str]]:
     images = []
     for root, dirs, files in os.walk(TEMP_IMAGES):
         for file in files:
-            if is_image_file(os.path.join(root, file)):
+            if is_image_file(valid_file_types, os.path.join(root, file)):
                 images.append((file, os.path.join(root, file)))
     return images
 
@@ -269,13 +270,17 @@ def unzip_and_save_files(compressed_file: InMemoryUploadedFile) -> (List[Image],
         to be duplicates
 
     """
+    valid_file_types = ImageConfig.objects.load().valid_image_formats
+    valid_file_types_str = ','.join(valid_file_types)
+
     unique_dir = uuid.uuid4()  # scope all operations to a directory for this request
     temp_file_path = save_to_temp(unique_dir, compressed_file)
     logger.info(f'Begining image processing for: {temp_file_path}')
+    logger.info(f'Checking for image extensions using: {valid_file_types_str}')
 
     saved_images = []
     new_images = 0
-    for file_name, file_path in process_images():
+    for file_name, file_path in process_images(valid_file_types):
         hash_string = hash_file(file_path)
         try:
             saved_image = Image.objects.get(hash=hash_string)

@@ -1,4 +1,3 @@
-from datetime import datetime
 import logging
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django import forms
@@ -146,15 +145,24 @@ class UploadEventViewSet(viewsets.ModelViewSet, ImageContainerView):
                     'name': ['Image group with this name already exists']
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(ImageGroupDetailSerializer(image_group).data, status=201)
+            return Response(ImageGroupDetailSerializer(image_group).data, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):
         form: UploadFileForm = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file: InMemoryUploadedFile = request.FILES['file']
             if not assert_compressed_file(file):
-                return Response('Invalid file type', 400)
+                return Response('Invalid file type', status=status.HTTP_400_BAD_REQUEST)
             saved_images, new_image_count = unzip_and_save_files(file)
+
+            # case where the user uploaded either a blank directory or a directory
+            # that contains no images, or contains invalid image types as defined in the
+            # image config admin
+            if len(saved_images) == 0:
+                return Response({
+                    'generic': ['Uploaded archive has no valid images']
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             upload_event = UploadEvent.objects.create(owner=request.user, file_name=file.name)
             upload_event.images.set(saved_images)
             upload_event.save()

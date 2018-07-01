@@ -1,17 +1,16 @@
 import time
 import pickle
 import os
-import io
 import logging
 from urllib.parse import urlparse, parse_qs
 import hashlib
 import asyncio
-import zipfile
 from concurrent.futures._base import TimeoutError, CancelledError
 from mimetypes import guess_all_extensions
 import uuid
 from collections import namedtuple
 from datetime import datetime
+from typing import List
 from django.db import models as models
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
@@ -28,6 +27,7 @@ from fake_useragent import FakeUserAgent
 from api import types
 from api.models import Base
 from images.models import Image, ImageContainer
+from mako.models import ImageConfig
 
 logger = logging.getLogger('django')
 ua = FakeUserAgent()
@@ -186,7 +186,7 @@ class Search(Base, ImageContainer):
             else:
                 return
 
-    async def save_downloaded_image(self, img_content, img_url):
+    async def save_downloaded_image(self, valid_image_formats: List[str], img_content, img_url):
         mime_type = magic.from_buffer(img_content, mime=True)
         if not mime_type:
             await self.update_log(f'Exluding file - Could not determine mime-type: {img_url}')
@@ -198,7 +198,7 @@ class Search(Base, ImageContainer):
                             f'extension from mime-type: {img_url}  mime-type: {mime_type}')
             return None, None
 
-        if file_extension in UNWANTED_FILE_EXTENSIONS:
+        if file_extension not in valid_image_formats:
             await self.update_log(f'Exluding file - unwanted extension: {img_url}  Extension: {file_extension}')
             return None, None
 
@@ -229,6 +229,7 @@ class Search(Base, ImageContainer):
             img_urls = await self.consolidate_image_sources(sources)
             responses = await self.download_images(img_urls)
 
+            valid_image_formats = ImageConfig.objects.load().valid_image_formats
             successful_image_saves = []
             failed_image_saves = []
             for img_buffer, source_url in responses:
@@ -236,12 +237,13 @@ class Search(Base, ImageContainer):
                     failed_image_saves.append(source_url)
                     continue
 
-                file_name, file_path = await self.save_downloaded_image(img_buffer, source_url)
+                file_name, file_path = await self.save_downloaded_image(valid_image_formats, img_buffer, source_url)
                 if file_path:
                     try:
                         saved_image = SavedImage(file_name, file_path, source_url, img_buffer)
                         successful_image_saves.append(saved_image)
                     except Exception as e:
+                        logger.exception('message')
                         failed_image_saves.append(source_url)
                         await self.update_log(f'Image download failed - Unknown error: {source_url}')
                 else:
@@ -262,6 +264,7 @@ class Search(Base, ImageContainer):
 
             return processed_images, failed_image_saves
         except Exception as e:
+            logger.exception('message')
             await self.update_log('\nError while processing search:\n\n', line=False)
             await self.update_log(str(e), line=False)
             return [], []
@@ -275,6 +278,7 @@ class Search(Base, ImageContainer):
         await self.update_log(INIT_LOG.format(self.url, self.search_term, self.pickle_path), line=False)
 
     async def update_log(self, text, line=True):
+        logger.debug(text)
         self.log += text if not line else f'{datetime.now().isoformat()} >>> {text}\n'
         self.save()
         await self.send(types.UPDATE_GOOGLE_SEARCH_LOG, {'id': self.id, 'log': self.log})
