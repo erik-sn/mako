@@ -58,8 +58,8 @@ class Api {
   public mergeSearches = (json: IMap<any>) =>
     axios.post(`${this.base}/google_searches/merge/`, json);
 
-  public downloadSearchImages = (id: number): void => {
-    const url = `${this.base}/google_searches/${id}/download_images/`;
+  public downloadImages = (endpoint: string, id: number): void => {
+    const url = `${this.base}/${endpoint}/${id}/download_images/`;
     const a = document.createElement('a');
     document.body.appendChild(a);
     // a.style = 'display: none';
@@ -89,6 +89,9 @@ class Api {
     axios.post(`${this.base}/imagegroups/`, json);
 
   public fetchImageGroups = (): AxiosPromise => axios.get(`${this.base}/image_groups/`);
+
+  public deleteImageGroup = (id: number): AxiosPromise =>
+    axios.delete(`${this.base}/image_groups/${id}/`);
 }
 
 export default new Api(API);

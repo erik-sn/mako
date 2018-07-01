@@ -4,10 +4,9 @@ import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ErrorIcon from '@material-ui/icons/ErrorOutline';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import GoogleSearch from '@/models/GoogleSearch';
-import UploadEvent from '@/models/UploadEvent';
+import ImageContainer from '@/models/ImageContainer';
 
-interface IProps { model: GoogleSearch | UploadEvent; }
+interface IProps { model: ImageContainer; }
 interface IState { error: boolean; }
 
 class ImageDownloader extends Component<IProps, IState> {

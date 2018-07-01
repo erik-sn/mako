@@ -108,7 +108,7 @@ class ImageUploader extends Component<IProps, {}> {
 
   private validateFile(uploadedFile: any) {
     const extension = uploadedFile.name.split('.').pop();
-    if (uploadedFile.type === 'application/gzip') {
+    if (uploadedFile.type === 'application/zip') {
       this.setState({ uploadedFile, error: '', success: false });
     } else {
       this.setState({

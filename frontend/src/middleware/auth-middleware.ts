@@ -22,7 +22,7 @@ export function setAuthorizationHeader(
  * Remove the token from localStorage and the axios
  * default header
  */
-export function clearAuthorizationHeader() {
+export function clearAuthorizationHeader(): void {
   localStorage.removeItem(REFRESH_TOKEN);
   localStorage.removeItem(REFRESH_TOKEN_EXPIRATION);
   axios.defaults.headers.common = {};

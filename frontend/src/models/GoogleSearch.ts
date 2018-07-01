@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
-import { AxiosPromise } from 'axios';
 
 import api from '@/utils/api';
+import ImageContainer from '@/models/ImageContainer';
 
 export interface IImage {
   name: string;
@@ -22,7 +22,7 @@ export interface IGoogleSearch {
   lastUpdated: string;
 }
 
-class GoogleSearch {
+class GoogleSearch extends ImageContainer {
   public id: number;
   public name: string;
   public description: string;
@@ -48,6 +48,7 @@ class GoogleSearch {
     created,
     lastUpdated,
   }: IGoogleSearch) {
+    super();
     this.id = id;
     this.name = name;
     this.description = description;
@@ -63,7 +64,7 @@ class GoogleSearch {
   }
 
   public downloadImages(): void {
-    return api.downloadSearchImages(this.id);
+    return api.downloadImages('google_searches', this.id);
   }
 }
 

@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -12,10 +10,8 @@ import { AxiosResponse, AxiosError } from 'axios';
 import api from '@/utils/api';
 import Loader from '@/components/generic/Loader';
 import Dialog from '@/components/generic/Dialog';
-import { IStore } from '@/interfaces/redux';
-import Grid from '@/components/generic/Grid';
-import Panel from './Panel';
 import UploadEvent from '@/models/UploadEvent';
+import ImageList from './ImageList';
 
 const styles = withStyles<any>((theme: any) => ({
   root: {
@@ -102,9 +98,7 @@ class UploadDetail extends Component<IProps, IState> {
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography className={classes.heading}>Images</Typography>
         </ExpansionPanelSummary>
-        <Grid elementHeight={250} elementWidth={170} containerHeight={600} className={classes.grid}>
-          {images.map(image => <Panel key={image.name} image={image} />)}
-        </Grid>
+        <ImageList images={upload.images} />
       </ExpansionPanel>
     );
   }

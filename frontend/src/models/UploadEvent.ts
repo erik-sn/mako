@@ -1,4 +1,6 @@
 import { DateTime } from 'luxon';
+
+import api from '@/utils/api';
 import { IImage } from '@/models/GoogleSearch';
 
 export interface IUploadEvent {
@@ -32,8 +34,8 @@ class UploadEvent {
     this.lastUpdatedStr = this.lastUpdated.toLocal().toLocaleString(DateTime.DATETIME_SHORT);
   }
 
-  public downloadImages(): Promise<void> {
-    return new Promise(() => null);
+  public downloadImages(): void {
+    return api.downloadImages('upload_events', this.id);
   }
 }
 

@@ -108,7 +108,7 @@ class UploadItem extends Component<IProps, {}> {
         <div className={classes.left}>
           <Checkbox checked={isAdded} onChange={this.handleCheck} className={classes.checkbox} />
           <Typography variant="body1" className={classes.imageCount}>
-            {upload.imageCount} Images
+            {upload.imageCount} Image{upload.imageCount > 1 ? 's' : ''}
           </Typography>
           <Link to={`/images/upload/${upload.id}/`} className={classes.link}>
             View images

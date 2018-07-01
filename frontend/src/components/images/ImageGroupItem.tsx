@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -9,11 +8,11 @@ import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ErrorIcon from '@material-ui/icons/ErrorOutline';
 import IconButton from '@material-ui/core/IconButton';
 
-import GoogleSearch from '../../models/GoogleSearch';
 import InlineError from '@/components/generic/InlineError';
 import api from '@/utils/api';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImageDownloader from './ImageDownloader';
+import ImageGroup from '@/models/ImageGroup';
 
 const styles = withStyles<any>((theme: any) => ({
   details: {
@@ -57,11 +56,7 @@ const styles = withStyles<any>((theme: any) => ({
 
 interface IProps {
   classes: any;
-  googleSearch: GoogleSearch;
-  active: boolean;
-  isAdded: boolean;
-  setActive: (id: number) => void;
-  addSearchToMerge: (id: number) => void;
+  imageGroup: ImageGroup;
   refresh: () => void;
 }
 
@@ -70,7 +65,7 @@ interface IState {
   downloadError: boolean;
 }
 
-class GoogleSearchItem extends Component<IProps, IState> {
+class ImageGroupItem extends Component<IProps, IState> {
   public state: IState = {
     deleteError: false,
     downloadError: false,
@@ -79,7 +74,7 @@ class GoogleSearchItem extends Component<IProps, IState> {
   private handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     api
-      .deleteGoogleSearch(this.props.googleSearch.id)
+      .deleteImageGroup(this.props.imageGroup.id)
       .then(() => {
         this.props.refresh();
       })
@@ -88,29 +83,24 @@ class GoogleSearchItem extends Component<IProps, IState> {
       });
   };
 
-  private handleCheck = () => {
-    this.props.addSearchToMerge(this.props.googleSearch.id);
-  };
-
   public render(): JSX.Element {
-    const { deleteError, downloadError } = this.state;
-    const { isAdded, classes, googleSearch } = this.props;
+    const { deleteError } = this.state;
+    const { classes, imageGroup } = this.props;
     return (
       <ExpansionPanelDetails className={classes.details}>
         <div className={classes.left}>
-          <Checkbox checked={isAdded} onChange={this.handleCheck} className={classes.checkbox} />
-          <Link to={`/images/google/${googleSearch.id}/`} className={classes.name}>
-            {googleSearch.name}
+          <Link to={`/images/groups/${imageGroup.id}/`} className={classes.name}>
+            {imageGroup.name}
           </Link>
           <Typography variant="body1" className={classes.imageCount}>
-            {googleSearch.imageCount} Images
+            {imageGroup.imageCount} Images
           </Typography>
         </div>
         <div className={classes.right}>
           <Typography className={classes.created} variant="body1">
-            {googleSearch.createdStr}
+            {imageGroup.createdStr}
           </Typography>
-          <ImageDownloader model={googleSearch} />
+          <ImageDownloader model={imageGroup} />
           {deleteError ? (
             <Tooltip id="tooltip-delete" title="Error deleting google search">
               <IconButton
@@ -136,4 +126,4 @@ class GoogleSearchItem extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(GoogleSearchItem);
+export default styles<any>(ImageGroupItem);
