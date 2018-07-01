@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Dropzone from 'react-dropzone';
+import Dropzone, { ImageFile } from 'react-dropzone';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -10,7 +10,6 @@ import Attachment from '@material-ui/icons/Attachment';
 import Snackbar from '@material-ui/core/Snackbar';
 
 import Info from '@/components/generic/Info';
-import { processError } from '@/utils/api';
 import { API } from '@/sagas/types';
 import Loader from '@/components/generic/Loader';
 
@@ -106,13 +105,23 @@ class ImageUploader extends Component<IProps, {}> {
     success: false,
   };
 
-  private validateFile(uploadedFile: any) {
+  private validContentType(fileType: string): boolean {
+    switch (fileType) {
+      case 'application/zip':
+      case 'application/gzip':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private validateFile(uploadedFile: ImageFile): void {
     const extension = uploadedFile.name.split('.').pop();
-    if (uploadedFile.type === 'application/zip') {
+    if (this.validContentType(uploadedFile.type)) {
       this.setState({ uploadedFile, error: '', success: false });
     } else {
       this.setState({
-        error: 'Invalid file - gz file required',
+        error: 'Invalid file - compressed file required',
         uploadedFile: undefined,
         success: false,
       });
@@ -124,7 +133,7 @@ class ImageUploader extends Component<IProps, {}> {
     this.setState({ uploadedFile: undefined, error: '', success: false });
   };
 
-  private handleDrop = (acceptedFiles: any) => {
+  private handleDrop = (acceptedFiles: ImageFile[]) => {
     this.validateFile(acceptedFiles[0]);
   };
 
@@ -186,7 +195,7 @@ class ImageUploader extends Component<IProps, {}> {
       <div className={classes.root}>
         <Info className={classes.info} title="Uploading Compressed Files">
           <div>
-            This uploader is expecting a compressed directory (.tar.gz) of images - they can be of
+            This uploader is expecting a compressed directory (.zip, .tar.gz, .gz) of images - they can be of
             any standard image format. To compress a directory you can run the following command in
             a terminal:
             <div className={classes.infoCode}>tar -zcvf compressed.tar.gz **your directory**</div>

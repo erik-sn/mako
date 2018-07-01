@@ -71,6 +71,7 @@ class ImageGroup(Base, ImageContainer):
 
 
 class UploadEvent(Base, ImageContainer):
+    file_name = models.CharField(max_length=255)
     images = models.ManyToManyField(Image)
     owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
     public = models.BooleanField(default=False)

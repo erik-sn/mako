@@ -268,11 +268,10 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        '*': {
+        'django.db.backends': {
+            'level': 'INFO',
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
+        }
     }
 }
 

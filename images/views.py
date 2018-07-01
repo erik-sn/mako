@@ -154,10 +154,8 @@ class UploadEventViewSet(viewsets.ModelViewSet, ImageContainerView):
             file: InMemoryUploadedFile = request.FILES['file']
             if not assert_compressed_file(file):
                 return Response('Invalid file type', 400)
-            logger.info(file)
             saved_images, new_image_count = unzip_and_save_files(file)
-            logger.info(saved_images)
-            upload_event = UploadEvent.objects.create(owner=request.user)
+            upload_event = UploadEvent.objects.create(owner=request.user, file_name=file.name)
             upload_event.images.set(saved_images)
             upload_event.save()
 

@@ -119,8 +119,8 @@ class Upload extends Component<IProps, IState> {
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Typography>
-              Drag & drop images from your file system here to upload, categorize and create image
-              groups.
+              Drag & drop zip or gzip directories of images from your file system here to upload,
+              categorize and create image groups.
             </Typography>
           </ExpansionPanelDetails>
           <ExpansionPanelDetails>

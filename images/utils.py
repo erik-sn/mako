@@ -4,9 +4,11 @@ import tarfile
 import zipfile
 from shutil import copyfile, rmtree
 import uuid
+from uuid import UUID
 import gzip
 import logging
-from typing import List
+import imghdr
+from typing import List, Tuple
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
 from django.db.models import Model
@@ -100,10 +102,12 @@ def assert_compressed_file(file: InMemoryUploadedFile) -> bool:
         return False
 
 
-def save_to_temp(file: InMemoryUploadedFile) -> str:
+def save_to_temp(unique_dir: UUID, file: InMemoryUploadedFile) -> str:
     """ Save the file to temporary storage
     Parameters
     ----------
+    unique_dir: UUID
+        unique directory that this operation is scoped to
     file : django.core.files.uploadedfile.InMemoryUploadedFile
         File uploaded by the user
 
@@ -112,7 +116,11 @@ def save_to_temp(file: InMemoryUploadedFile) -> str:
     file_path : str
         file path of the saved file
     """
-    file_path = f'images/temp/{file.name}'
+    file_directory = f'images/temp/{unique_dir}'
+    file_path = f'{file_directory}/{file.name}'
+    if not os.path.exists(file_directory):
+        os.makedirs(file_directory)
+
     with open(file_path, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -137,23 +145,27 @@ def extract_contents(file_path: str) -> None:
             zip_file.extractall(path=TEMP_IMAGES)
 
 
-def is_image_file(file_name: str) -> bool:
+def is_image_file(file_path: str) -> bool:
     """
 
     Parameters
     ----------
-    file_name : str
-        name of the file to check
+    file_path : str
+        path to the file we are checking
 
     Returns
     -------
     bool
         if the file name has an image extension
     """
-    return file_name.endswith('.jpg')
+    file_type = imghdr.what(file_path)
+    valid_image = file_type in ['jpg', 'jpeg', 'png']
+    if not valid_image:
+        logger.warning(f'Ignoring for incorrect image type: {file_type} - {file_path}')
+    return valid_image
 
 
-def process_images() -> List[str]:
+def process_images() -> List[Tuple[str, str]]:
     """Find all files in the temp directory that are image files
     Returns
     -------
@@ -163,7 +175,7 @@ def process_images() -> List[str]:
     images = []
     for root, dirs, files in os.walk(TEMP_IMAGES):
         for file in files:
-            if is_image_file(file):
+            if is_image_file(os.path.join(root, file)):
                 images.append((file, os.path.join(root, file)))
     return images
 
@@ -186,7 +198,9 @@ def hash_file(file_path: str) -> str:
     with open(file_path, 'rb') as file:
         for chunk in iter(lambda: file.read(4096), b''):
             md5.update(chunk)
-        return md5.hexdigest()
+        hash_string = md5.hexdigest()
+        logger.debug(f'Created hash {hash_string} for file: {file_path}')
+        return hash_string
 
 
 def save_image(file_name: str, file_path: str, hash_string: str) -> Image:
@@ -226,6 +240,7 @@ def clean_temp_directory(temp_file_path: str) -> None:
     temp_file_path - file path of the original file uploaded by the user
 
     """
+    logger.debug(f'Clearing temporary file path: {temp_file_path}')
     for the_file in os.listdir(TEMP_IMAGES):
         file_path = os.path.join(TEMP_IMAGES, the_file)
         try:
@@ -234,16 +249,16 @@ def clean_temp_directory(temp_file_path: str) -> None:
             elif os.path.isdir(file_path):
                 rmtree(file_path)
         except Exception as e:
-            print(e)
+            logger.exception('message')
     os.unlink(temp_file_path)
 
 
-def unzip_and_save_files(gzip_file: InMemoryUploadedFile) -> (List[Image], List[Image]):
-    """unzip the gzip directory and process all containing images
+def unzip_and_save_files(compressed_file: InMemoryUploadedFile) -> (List[Image], int):
+    """unzip the compressed directory and process all containing images
 
     Parameters
     ----------
-    gzip_file : InMemoryUploadedFile
+    compressed_file : InMemoryUploadedFile
         file uploaded by the user
 
     Returns
@@ -254,7 +269,9 @@ def unzip_and_save_files(gzip_file: InMemoryUploadedFile) -> (List[Image], List[
         to be duplicates
 
     """
-    temp_file_path = save_to_temp(gzip_file)
+    unique_dir = uuid.uuid4()  # scope all operations to a directory for this request
+    temp_file_path = save_to_temp(unique_dir, compressed_file)
+    logger.info(f'Begining image processing for: {temp_file_path}')
 
     saved_images = []
     new_images = 0
@@ -262,10 +279,13 @@ def unzip_and_save_files(gzip_file: InMemoryUploadedFile) -> (List[Image], List[
         hash_string = hash_file(file_path)
         try:
             saved_image = Image.objects.get(hash=hash_string)
+            logger.debug(f'Image already exists: {file_name}')
         except Image.DoesNotExist:
             saved_image = save_image(file_name, file_path, hash_string)
+            logger.debug(f'Created new image: {file_name} at {file_path}')
             new_images += 1
         saved_images.append(saved_image)
 
     clean_temp_directory(temp_file_path)
+    logger.info(f'Finished processing images. Total: {len(saved_images)} New: {new_images}')
     return saved_images, new_images
