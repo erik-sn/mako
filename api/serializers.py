@@ -47,3 +47,30 @@ class OptionsSerializer(serializers.Serializer):
     training_steps = serializers.IntegerField(min_value=1, max_value=10000)
     testing_percentage = serializers.IntegerField(min_value=1, max_value=99)
 
+
+class SoftwareSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.Software
+        fields = '__all__'
+
+class WrapperSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.Wrapper
+        fields = '__all__'
+
+class ResultRunSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.ResultRun
+        fields = '__all__'
+
+class ParameterSerializer(serializers.Serializer):
+    parameters = serializers.CharField(max_length=20)
+
+class DummySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Dummy
+        fields = '__all__'

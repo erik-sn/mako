@@ -104,7 +104,7 @@ class Classifier(Base):
 
     def _create_image_directories(self) -> (str, str):
         dir_name, dir_path = self._create_unique_directory()
-        for image_group in self.image_groups.all():
+        f   or image_group in self.image_groups.all():
             image_group.copy_to_directory(dir_path)
         return dir_name, dir_path
 
@@ -117,9 +117,46 @@ class Classifier(Base):
         return unique_dir_name, dir_path
 
 
+#running a wrapper with certain specifications on a software creates results
+class Software(models.Model):
+    name = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    files_dir = models.CharField(max_length=255) #create unique directory
 
 
+class ResultRun(models.Model):
+    name = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    software = models.ForeignKey('Software', null=True, on_delete=models.SET_NULL)
+    wrapper = models.ForeignKey('Wrapper', null=True, on_delete=models.SET_NULL)
+    params = models.CharField(max_length=255)
+    results = models.TextField(null=True)
 
+class Wrapper(models.Model):
+    name = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    software = models.ForeignKey('Software', null=True, on_delete=models.SET_NULL)
+    file_dir = models.CharField(max_length=255) #get directory from software
+    params_inputs = models.CharField(max_length=255)
+    out_type_file = models.BooleanField()
+    out_type_arr = models.BooleanField()
+    out_type_intrmd = models.BooleanField()
+
+    def run(self, **options) -> ResultRun:
+
+        result_run = ResultsRun.objects.create(
+            wrapper = self,
+            software = software,
+            **options
+        ) 
+
+        result_run.save()
+
+        return result_run
+
+
+class Dummy(models.Model):
+    name = models.CharField(max_length=255)
 
 
 
