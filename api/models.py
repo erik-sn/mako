@@ -7,6 +7,7 @@ from django.utils import timezone
 from django_extensions.db import fields as extension_fields
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User as AuthUser
 
 
 class Base(models.Model):
@@ -104,7 +105,7 @@ class Classifier(Base):
 
     def _create_image_directories(self) -> (str, str):
         dir_name, dir_path = self._create_unique_directory()
-        f   or image_group in self.image_groups.all():
+        for image_group in self.image_groups.all():
             image_group.copy_to_directory(dir_path)
         return dir_name, dir_path
 
@@ -116,44 +117,68 @@ class Classifier(Base):
         os.makedirs(dir_path)
         return unique_dir_name, dir_path
 
-
-#running a wrapper with certain specifications on a software creates results
+# to-do:
+# saving files: # software gets assigned a unique dir
+                # file is hashed and saved in that directory
+                    # upload event should be incorporated in software create method
+                # forget run command for now ... 
+#run a command in a container with a software consisting of  
 class Software(models.Model):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    files_dir = models.CharField(max_length=255) #create unique directory
+    readme = models.TextField(default='', blank=True)
+    root_dir = models.CharField(
+        max_length=255, 
+        # default=_create_unique_directory(self.name),
+        # editable=False
+    )
+    run_command = models.CharField(max_length=255, blank=True)
 
+    # def _create_unique_directory(name) -> str:
+    #     timestamp: str = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
+    #     unique_dir_name = f'{name}_{timestamp}'
+    #     dir_path: str = os.path.join(settings.TEMP_SOFTWARE, unique_dir_name)
+    #     os.makedirs(dir_path)
+    #     return dir_path
 
-class ResultRun(models.Model):
+class File(models.Model):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    software = models.ForeignKey('Software', null=True, on_delete=models.SET_NULL)
-    wrapper = models.ForeignKey('Wrapper', null=True, on_delete=models.SET_NULL)
-    params = models.CharField(max_length=255)
-    results = models.TextField(null=True)
+    file_type = models.CharField(max_length=255, default='static', choices=[
+        ('static', 'Static'),
+        ('variable', 'Variable'),
+        ('parameters', 'Parameters'),
+        ('input', 'Input'),
+        ('results', 'Results'),
+        ('output', 'Output')
+    ])
+    software = models.ForeignKey('Software', null=True, on_delete=models.CASCADE)
+    relative_dir = models.CharField(max_length=255)
+    #version?
+#####
+class DummyFile(models.Model):
+    name = models.CharField(max_length=255, primary_key=True)
+    description = models.TextField(default='')
+    file_path = models.TextField()
+    hash = models.CharField(max_length=255, null=False)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
 
-class Wrapper(models.Model):
-    name = models.CharField(max_length=255)
+class UploadEvent(Base):
+    file_name = models.CharField(max_length=255)
+    files = models.ManyToManyField(DummyFile)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
+    public = models.BooleanField(default=False)
+    description = models.TextField(blank=True, default='')
+
+class DummySoftware(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    root_dir = models.CharField(max_length=255)
+    run_command = models.CharField(max_length=255)
+
+class DummyResult(models.Model):
+    results = models.CharField(max_length=255, null=True)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    software = models.ForeignKey('Software', null=True, on_delete=models.SET_NULL)
-    file_dir = models.CharField(max_length=255) #get directory from software
-    params_inputs = models.CharField(max_length=255)
-    out_type_file = models.BooleanField()
-    out_type_arr = models.BooleanField()
-    out_type_intrmd = models.BooleanField()
-
-    def run(self, **options) -> ResultRun:
-
-        result_run = ResultsRun.objects.create(
-            wrapper = self,
-            software = software,
-            **options
-        ) 
-
-        result_run.save()
-
-        return result_run
-
+    software = models.ForeignKey('DummySoftware', null=True, on_delete=models.CASCADE)
 
 class Dummy(models.Model):
     name = models.CharField(max_length=255)

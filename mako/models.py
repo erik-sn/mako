@@ -40,3 +40,18 @@ class ImageConfig(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
+
+class FileConfig(models.Model):
+    valid_file_formats = ArrayField(models.CharField(max_length=10), default=['py', 'c', 'cpp'])
+
+    objects = ConfigManager()
+
+    def __str__(self):
+        return 'Mako file configuration'
+
+    def delete(self, *args, **kwargs):
+        return NotImplementedError('The file configuration cannot be deleted')
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)

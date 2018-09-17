@@ -54,20 +54,45 @@ class SoftwareSerializer(serializers.ModelSerializer):
         model = models.Software
         fields = '__all__'
 
-class WrapperSerializer(serializers.ModelSerializer):
+class FileSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = models.Wrapper
+        model = models.File
         fields = '__all__'
 
-class ResultRunSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = models.ResultRun
-        fields = '__all__'
 
 class ParameterSerializer(serializers.Serializer):
     parameters = serializers.CharField(max_length=20)
+
+
+
+##########################################################
+##########################################################
+
+class DummyFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.DummyFile
+        fields = '__all__'
+
+class UploadEventSerializer(serializers.ModelSerializer):
+    files = DummyFileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.UploadEvent
+        fields = ('id', 'files', 'owner', 'created', 'last_updated')
+
+class DummySoftwareSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.DummySoftware
+        fields = '__all__'
+
+class DummyResultSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.DummyResult
+        fields = '__all__'
 
 class DummySerializer(serializers.ModelSerializer):
 

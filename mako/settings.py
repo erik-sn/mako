@@ -22,6 +22,13 @@ PICKLE_DIR = os.path.join('/tmp/vision', 'pickles')
 if not os.path.exists(PICKLE_DIR):
     os.makedirs(PICKLE_DIR)
 
+TEMP_FILES = os.path.join('/tmp/software', 'files', 'temp')
+if not os.path.exists(TEMP_FILES):
+    os.makedirs(TEMP_FILES)
+
+SAVED_FILES = os.path.join('/tmp/software', 'files', 'saved')
+if not os.path.exists(SAVED_FILES):
+    os.makedirs(SAVED_FILES)
 
 # Application definition
 INSTALLED_APPS = [
