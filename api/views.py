@@ -21,8 +21,9 @@ from api.serializers import (
     ParameterSerializer,
     SoftwareSerializer,
     FileSerializer,
+    FileUploadEventSerializer,
 
-    UploadEventSerializer,
+    DummyUploadEventSerializer,
     DummySerializer,
     DummySoftwareSerializer,
     DummyResultSerializer,
@@ -33,8 +34,9 @@ from api.models import (
     TrainingRun,
     Software,
     File,
+    FileUploadEvent,
 
-    UploadEvent,
+    DummyUploadEvent,
     Dummy,
     DummySoftware,
     DummyResult,
@@ -105,30 +107,27 @@ class TrainingRunViewset(viewsets.ReadOnlyModelViewSet):
 # results: get file output
 # get array output?
 
-class SoftwareViewSet(viewsets.ModelViewSet):
-    queryset = Software.objects.all()
-    serializer_class = SoftwareSerializer
 
 class FileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all()
     serializer_class = FileSerializer
     
-def function(input):
-    return 'This is the input: '+str(input)
-
-
-
-
-
 class UploadFileForm(forms.Form):
     file = forms.FileField()
 
-class UploadEventViewSet(viewsets.ModelViewSet):
+class SoftwareViewSet(viewsets.ModelViewSet):
+    """
+    view to handle software creation
+    """
+    serializer_class = SoftwareSerializer
+    model_class = Software
+
+class FileUploadEventViewSet(viewsets.ModelViewSet):
     """
     view to handle uploading of single file
     """
-    serializer_class = UploadEventSerializer
-    model_class = UploadEvent
+    serializer_class = FileUploadEventSerializer
+    model_class = FileUploadEvent
     queryset = model_class.objects.all()
 
     def get_queryset(self):
@@ -141,15 +140,43 @@ class UploadEventViewSet(viewsets.ModelViewSet):
 
             saved_files, new_file_count = save_files(file)
 
-            upload_event = UploadEvent.objects.create(owner=request.user, file_name=file.name)
+            upload_event = FileUploadEvent.objects.create(owner=request.user, file_name=file.name)
             upload_event.files.set(saved_files)
             upload_event.save()
 
-            serializer = UploadEventSerializer(upload_event)
+            serializer = FileUploadEventSerializer(upload_event)
             return Response(serializer.data, status=201)
 
         return Response(form.errors, status=400)
 
+############################ 
+
+class DummyUploadEventViewSet(viewsets.ModelViewSet):
+    """
+    view to handle uploading of single file
+    """
+    serializer_class = DummyUploadEventSerializer
+    model_class = DummyUploadEvent
+    queryset = model_class.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(owner=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        form: UploadFileForm = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file: InMemoryUploadedFile = request.FILES['file']
+
+            saved_files, new_file_count = save_files(file)
+
+            upload_event = DummyUploadEvent.objects.create(owner=request.user, file_name=file.name)
+            upload_event.files.set(saved_files)
+            upload_event.save()
+
+            serializer = DummyUploadEventSerializer(upload_event)
+            return Response(serializer.data, status=201)
+
+        return Response(form.errors, status=400)
 
 class DummySoftwareViewSet(viewsets.ModelViewSet):
     queryset = DummySoftware.objects.all()

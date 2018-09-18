@@ -9,6 +9,15 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import User
 from django.contrib.auth.models import User as AuthUser
 
+######
+# def _create_unique_directory(name) -> str:
+#     timestamp: str = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
+#     unique_dir_name = f'{name}_{timestamp}'
+#     dir_path: str = os.path.join(settings.SAVED_FILES, unique_dir_name)
+#     os.makedirs(dir_path)
+#     return dir_path
+######
+
 
 class Base(models.Model):
     name = models.CharField(max_length=255)
@@ -121,28 +130,30 @@ class Classifier(Base):
 # saving files: # software gets assigned a unique dir
                 # file is hashed and saved in that directory
                     # upload event should be incorporated in software create method
-                # forget run command for now ... 
+                    # upload event can also be separated from software create method
+                        #file creation requires software
+                    #multiple files can eb separated by version number
+                # forget run command for now ...  
 #run a command in a container with a software consisting of  
+
+
 class Software(models.Model):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     readme = models.TextField(default='', blank=True)
-    root_dir = models.CharField(
-        max_length=255, 
-        # default=_create_unique_directory(self.name),
-        # editable=False
-    )
     run_command = models.CharField(max_length=255, blank=True)
 
-    # def _create_unique_directory(name) -> str:
-    #     timestamp: str = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
-    #     unique_dir_name = f'{name}_{timestamp}'
-    #     dir_path: str = os.path.join(settings.TEMP_SOFTWARE, unique_dir_name)
-    #     os.makedirs(dir_path)
-    #     return dir_path
+    # root_dir = models.CharField(
+    #     max_length=255, 
+    #     default=_create_unique_directory(name),
+    #     editable=False
+    # )
 
 class File(models.Model):
     name = models.CharField(max_length=255)
+    file_path = models.TextField()
+    hash = models.CharField(max_length=255, null=False)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     file_type = models.CharField(max_length=255, default='static', choices=[
         ('static', 'Static'),
@@ -152,9 +163,16 @@ class File(models.Model):
         ('results', 'Results'),
         ('output', 'Output')
     ])
-    software = models.ForeignKey('Software', null=True, on_delete=models.CASCADE)
+    software = models.ForeignKey('Software', on_delete=models.CASCADE)
+    version = models.IntegerField(default=0)
     relative_dir = models.CharField(max_length=255)
-    #version?
+
+class FileUploadEvent(models.Model):
+    file_name = models.CharField(max_length=255)
+    files = models.ManyToManyField(File)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
+    public = models.BooleanField(default=False)
+
 #####
 class DummyFile(models.Model):
     name = models.CharField(max_length=255, primary_key=True)
@@ -163,10 +181,10 @@ class DummyFile(models.Model):
     hash = models.CharField(max_length=255, null=False)
     owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
 
-class UploadEvent(Base):
+class DummyUploadEvent(Base):
     file_name = models.CharField(max_length=255)
     files = models.ManyToManyField(DummyFile)
-    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="dummy_auth_user")
     public = models.BooleanField(default=False)
     description = models.TextField(blank=True, default='')
 

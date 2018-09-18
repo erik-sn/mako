@@ -1,7 +1,7 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
 from mako.models import FileConfig
-from api.models import DummyFile
+from api.models import DummyFile, File
 import logging
 from typing import List, Tuple
 import uuid
@@ -11,7 +11,7 @@ import zipfile
 import tarfile
 import imghdr
 import hashlib
-from shutil import copyfile
+from shutil import copyfile, rmtree
 
 logger = logging.getLogger('django')
 
@@ -27,6 +27,9 @@ def get_client_ip(request):
     return ip
 ######
 
+#no list and create real file not dummy
+#add extra fields -- or in view?
+#increment version if already exists
 def save_files(uploaded_file: InMemoryUploadedFile) -> (List[DummyFile], int):
     """ process all requested files
 
@@ -37,7 +40,7 @@ def save_files(uploaded_file: InMemoryUploadedFile) -> (List[DummyFile], int):
 
     Returns
     -------
-    tuple (list of DummyFile objects, list of DummyFileObjects)
+    tuple (list of File objects, list of FileObjects)
         first item is a list of all new File objects that were created and
         the second item is a list of all File objects that were found
         to be duplicates
@@ -157,6 +160,7 @@ def hash_file(file_path: str) -> str:
         logger.debug(f'Created hash {hash_string} for file: {file_path}')
         return hash_string
 
+#real file
 def save_file(file_name: str, file_path: str, hash_string: str) -> DummyFile:
     """save a file into the database
 
@@ -176,7 +180,7 @@ def save_file(file_name: str, file_path: str, hash_string: str) -> DummyFile:
 
     """
     _, file_extension = os.path.splitext(file_name)
-    uuid_name = f'{uuid.uuid4()}{file_extension}'
+    uuid_name = f'{uuid.uuid4()}{file_extension}' # no uuid!!!!
     save_path = os.path.join(SAVED_FILES, uuid_name)
     copyfile(file_path, save_path)
     return DummyFile.objects.create(
@@ -195,4 +199,4 @@ def clean_temp_directory(temp_file_path: str) -> None:
     """
     logger.debug(f'Clearing temporary file path: {os.path.dirname(temp_file_path)}')
 
-    os.unlink(os.path.dirname(temp_file_path))
+    rmtree(os.path.dirname(temp_file_path))

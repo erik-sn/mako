@@ -60,6 +60,12 @@ class FileSerializer(serializers.ModelSerializer):
         model = models.File
         fields = '__all__'
 
+class FileUploadEventSerializer(serializers.ModelSerializer):
+    files = FileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.FileUploadEvent
+        fields = ('id', 'files', 'owner', 'created', 'last_updated')
 
 class ParameterSerializer(serializers.Serializer):
     parameters = serializers.CharField(max_length=20)
@@ -75,11 +81,11 @@ class DummyFileSerializer(serializers.ModelSerializer):
         model = models.DummyFile
         fields = '__all__'
 
-class UploadEventSerializer(serializers.ModelSerializer):
+class DummyUploadEventSerializer(serializers.ModelSerializer):
     files = DummyFileSerializer(many=True, read_only=True)
 
     class Meta:
-        model = models.UploadEvent
+        model = models.DummyUploadEvent
         fields = ('id', 'files', 'owner', 'created', 'last_updated')
 
 class DummySoftwareSerializer(serializers.ModelSerializer):
