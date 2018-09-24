@@ -12,5 +12,9 @@ v1_router.register('upload_events', images_views.UploadEventViewSet, base_name='
 v1_router.register('image_groups', images_views.ImageGroupViewSet, base_name='image_groups')
 v1_router.register('images', images_views.ImageViewSet, base_name='images')
 
+v1_router.register(r'software', api_views.SoftwareViewSet, base_name='software')
+v1_router.register(r'files', api_views.FileViewSet, base_name='files')
+v1_router.register(r'file_upload_event', api_views.FileUploadEventViewSet, base_name='file_upload_event')
+
 
 urlpatterns = v1_router.urls

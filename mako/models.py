@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+FILE_EXTENSIONS = ['.txt', '.dat', '.db', '.log', '.mbd', '.sql', '.xml',\
+                    '.py', '.c', '.cpp', '.m', '.txt', '.bat', '.bin', '.exe',\
+                    '.jar', '.wsf', '.cgi', '.apk', '.com', '.html', '.css',\
+                    '.rss', '.js', '.jsx', '.php', '.cs', '.java', '.h', '.o',\
+                    '.swift', '.sh', '.vb', '.class']
 
 class ConfigManager(models.Manager):
     def load(self):
@@ -36,6 +41,21 @@ class ImageConfig(models.Model):
 
     def delete(self, *args, **kwargs):
         return NotImplementedError('The image configuration cannot be deleted')
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+class FileConfig(models.Model):
+    valid_file_formats = ArrayField(models.CharField(max_length=10), default=FILE_EXTENSIONS)
+
+    objects = ConfigManager()
+
+    def __str__(self):
+        return 'Mako file configuration'
+
+    def delete(self, *args, **kwargs):
+        return NotImplementedError('The file configuration cannot be deleted')
 
     def save(self, *args, **kwargs):
         self.pk = 1

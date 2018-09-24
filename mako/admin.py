@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.cache import cache
 
-from .models import SiteConfig, ImageConfig
+from .models import SiteConfig, ImageConfig, FileConfig
 
 
 def clear_all_caches(modeladmin, request, queryset):
@@ -18,6 +18,10 @@ class SiteConfigAdmin(admin.ModelAdmin):
 class ImageConfigAdmin(admin.ModelAdmin):
     test = 1
 
+class FileConfigAdmin(admin.ModelAdmin):
+    test = 1
+
 
 admin.site.register(SiteConfig, SiteConfigAdmin)
 admin.site.register(ImageConfig, ImageConfigAdmin)
+admin.site.register(FileConfig, FileConfigAdmin)

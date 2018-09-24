@@ -7,6 +7,16 @@ from django.utils import timezone
 from django_extensions.db import fields as extension_fields
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User as AuthUser
+
+######
+# def _create_unique_directory(name) -> str:
+#     timestamp: str = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
+#     unique_dir_name = f'{name}_{timestamp}'
+#     dir_path: str = os.path.join(settings.SAVED_FILES, unique_dir_name)
+#     os.makedirs(dir_path)
+#     return dir_path
+######
 
 
 class Base(models.Model):
@@ -116,10 +126,41 @@ class Classifier(Base):
         os.makedirs(dir_path)
         return unique_dir_name, dir_path
 
+# to-do:
+#run a command in a container with a software consisting of  
 
+class Software(models.Model):
+    name = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    readme = models.TextField(default='', blank=True)
+    run_command = models.CharField(max_length=255, blank=True)
 
+class File(models.Model):
+    name = models.CharField(max_length=255)
+    uuid_name = models.CharField(max_length=255)
+    file_path = models.TextField()
+    hash = models.CharField(max_length=255, null=False)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    file_type = models.CharField(max_length=255, default='static')
 
+    software = models.ForeignKey('Software', on_delete=models.CASCADE)
+    version = models.IntegerField(default=0)
+    relative_dir = models.CharField(max_length=255)
 
+class FileUploadEvent(Base):
+    file_name = models.CharField(max_length=255)
+    files = models.ManyToManyField(File)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
+    public = models.BooleanField(default=False)
 
-
-
+    relative_dir = models.CharField(max_length=255, default='./')
+    software = models.ForeignKey('Software', on_delete=models.CASCADE)
+    file_type = models.CharField(max_length=255, default='static', choices=[
+        ('static', 'Static'),
+        ('variable', 'Variable'),
+        ('parameters', 'Parameters'),
+        ('input', 'Input'),
+        ('results', 'Results'),
+        ('output', 'Output')
+    ])
