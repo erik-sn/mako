@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+FILE_EXTENSIONS = ['.txt', '.dat', '.db', '.log', '.mbd', '.sql', '.xml',\
+                    '.py', '.c', '.cpp', '.m', '.txt', '.bat', '.bin', '.exe',\
+                    '.jar', '.wsf', '.cgi', '.apk', '.com', '.html', '.css',\
+                    '.rss', '.js', '.jsx', '.php', '.cs', '.java', '.h', '.o',\
+                    '.swift', '.sh', '.vb', '.class']
 
 class ConfigManager(models.Manager):
     def load(self):
@@ -42,7 +47,7 @@ class ImageConfig(models.Model):
         super().save(*args, **kwargs)
 
 class FileConfig(models.Model):
-    valid_file_formats = ArrayField(models.CharField(max_length=10), default=['py', 'c', 'cpp'])
+    valid_file_formats = ArrayField(models.CharField(max_length=10), default=FILE_EXTENSIONS)
 
     objects = ConfigManager()
 

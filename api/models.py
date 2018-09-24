@@ -127,15 +127,7 @@ class Classifier(Base):
         return unique_dir_name, dir_path
 
 # to-do:
-# saving files: # software gets assigned a unique dir
-                # file is hashed and saved in that directory
-                    # upload event should be incorporated in software create method
-                    # upload event can also be separated from software create method
-                        #file creation requires software
-                    #multiple files can eb separated by version number
-                # forget run command for now ...  
 #run a command in a container with a software consisting of  
-
 
 class Software(models.Model):
     name = models.CharField(max_length=255)
@@ -143,18 +135,27 @@ class Software(models.Model):
     readme = models.TextField(default='', blank=True)
     run_command = models.CharField(max_length=255, blank=True)
 
-    # root_dir = models.CharField(
-    #     max_length=255, 
-    #     default=_create_unique_directory(name),
-    #     editable=False
-    # )
-
 class File(models.Model):
     name = models.CharField(max_length=255)
+    uuid_name = models.CharField(max_length=255)
     file_path = models.TextField()
     hash = models.CharField(max_length=255, null=False)
     owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    file_type = models.CharField(max_length=255, default='static')
+
+    software = models.ForeignKey('Software', on_delete=models.CASCADE)
+    version = models.IntegerField(default=0)
+    relative_dir = models.CharField(max_length=255)
+
+class FileUploadEvent(Base):
+    file_name = models.CharField(max_length=255)
+    files = models.ManyToManyField(File)
+    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
+    public = models.BooleanField(default=False)
+
+    relative_dir = models.CharField(max_length=255, default='./')
+    software = models.ForeignKey('Software', on_delete=models.CASCADE)
     file_type = models.CharField(max_length=255, default='static', choices=[
         ('static', 'Static'),
         ('variable', 'Variable'),
@@ -163,43 +164,3 @@ class File(models.Model):
         ('results', 'Results'),
         ('output', 'Output')
     ])
-    software = models.ForeignKey('Software', on_delete=models.CASCADE)
-    version = models.IntegerField(default=0)
-    relative_dir = models.CharField(max_length=255)
-
-class FileUploadEvent(models.Model):
-    file_name = models.CharField(max_length=255)
-    files = models.ManyToManyField(File)
-    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="auth_user")
-    public = models.BooleanField(default=False)
-
-#####
-class DummyFile(models.Model):
-    name = models.CharField(max_length=255, primary_key=True)
-    description = models.TextField(default='')
-    file_path = models.TextField()
-    hash = models.CharField(max_length=255, null=False)
-    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL)
-
-class DummyUploadEvent(Base):
-    file_name = models.CharField(max_length=255)
-    files = models.ManyToManyField(DummyFile)
-    owner = models.ForeignKey(AuthUser, null=True, on_delete=models.SET_NULL, related_name="dummy_auth_user")
-    public = models.BooleanField(default=False)
-    description = models.TextField(blank=True, default='')
-
-class DummySoftware(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    root_dir = models.CharField(max_length=255)
-    run_command = models.CharField(max_length=255)
-
-class DummyResult(models.Model):
-    results = models.CharField(max_length=255, null=True)
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-    software = models.ForeignKey('DummySoftware', null=True, on_delete=models.CASCADE)
-
-class Dummy(models.Model):
-    name = models.CharField(max_length=255)
-
-
-

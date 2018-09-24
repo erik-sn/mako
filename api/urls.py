@@ -16,11 +16,5 @@ v1_router.register(r'software', api_views.SoftwareViewSet, base_name='software')
 v1_router.register(r'files', api_views.FileViewSet, base_name='files')
 v1_router.register(r'file_upload_event', api_views.FileUploadEventViewSet, base_name='file_upload_event')
 
-v1_router.register(r'dummy_upload_event', api_views.DummyUploadEventViewSet, base_name='dummy_upload_event')
-v1_router.register(r'dummy_software', api_views.DummySoftwareViewSet, base_name='dummy_software')
-v1_router.register(r'dummy_result', api_views.DummyResultViewSet, base_name='dummy_result')
-v1_router.register(r'dummy_file', api_views.DummyFileViewSet, base_name='dummy_file')
-v1_router.register(r'dummy', api_views.DummyViewSet, base_name='dummy')
-
 
 urlpatterns = v1_router.urls

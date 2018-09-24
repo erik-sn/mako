@@ -47,7 +47,6 @@ class OptionsSerializer(serializers.Serializer):
     training_steps = serializers.IntegerField(min_value=1, max_value=10000)
     testing_percentage = serializers.IntegerField(min_value=1, max_value=99)
 
-
 class SoftwareSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -65,43 +64,4 @@ class FileUploadEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.FileUploadEvent
-        fields = ('id', 'files', 'owner', 'created', 'last_updated')
-
-class ParameterSerializer(serializers.Serializer):
-    parameters = serializers.CharField(max_length=20)
-
-
-
-##########################################################
-##########################################################
-
-class DummyFileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.DummyFile
-        fields = '__all__'
-
-class DummyUploadEventSerializer(serializers.ModelSerializer):
-    files = DummyFileSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = models.DummyUploadEvent
-        fields = ('id', 'files', 'owner', 'created', 'last_updated')
-
-class DummySoftwareSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.DummySoftware
-        fields = '__all__'
-
-class DummyResultSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.DummyResult
-        fields = '__all__'
-
-class DummySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Dummy
-        fields = '__all__'
+        fields = ('id', 'files', 'owner', 'created', 'last_updated', 'relative_dir', 'file_type', 'software')

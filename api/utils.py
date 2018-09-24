@@ -1,15 +1,15 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
 from mako.models import FileConfig
-from api.models import DummyFile, File
+from api.models import File
 import logging
 from typing import List, Tuple
 import uuid
 from uuid import UUID
 import os
+import pathlib
 import zipfile
 import tarfile
-import imghdr
 import hashlib
 from shutil import copyfile, rmtree
 
@@ -27,16 +27,20 @@ def get_client_ip(request):
     return ip
 ######
 
-#no list and create real file not dummy
-#add extra fields -- or in view?
-#increment version if already exists
-def save_files(uploaded_file: InMemoryUploadedFile) -> (List[DummyFile], int):
+#to-do: get rid of list stuff
+def save_files(uploaded_file: InMemoryUploadedFile, software, relative_dir, file_type) -> (List[File], int):
     """ process all requested files
 
     Parameters
     ----------
     uploaded_file : InMemoryUploadedFile
         file uploaded by the user
+    software : Software object
+        software that the file is related to
+    relative_dir : str
+        relative directory within software
+    file_type : str
+        file type within software
 
     Returns
     -------
@@ -49,6 +53,7 @@ def save_files(uploaded_file: InMemoryUploadedFile) -> (List[DummyFile], int):
     #get valid file type
     valid_file_types = FileConfig.objects.load().valid_file_formats
     valid_file_types_str = ','.join(valid_file_types)
+    logger.debug(f'valid file types: {valid_file_types_str}')
 
     #create a unique temporary directory and save files to it
     unique_dir = uuid.uuid4()  # scope all operations to a directory for this request
@@ -63,15 +68,9 @@ def save_files(uploaded_file: InMemoryUploadedFile) -> (List[DummyFile], int):
     for file_name, file_path in process_files(valid_file_types, temp_file_path):
         #hash file
         hash_string = hash_file(file_path)
-        try:
-            #file already exists
-            saved_file = DummyFile.objects.get(hash=hash_string)
-            logger.debug(f'File already exists: {file_name}')
-        except DummyFile.DoesNotExist:
-            #create new file object
-            saved_file = save_file(file_name, file_path, hash_string)
-            logger.debug(f'Created new file: {file_name} at {file_path}')
-            new_files += 1
+        #create new file object
+        saved_file = save_file(file_name, file_path, hash_string, software, relative_dir, file_type)
+        new_files += 1
         saved_files.append(saved_file)
 
     #remove temp directory
@@ -102,21 +101,21 @@ def save_to_temp(unique_dir: UUID, file: InMemoryUploadedFile) -> str:
             destination.write(chunk)
     return file_path
 
+#add check to file type
 def process_files(valid_file_types: List[str], temp_file_path: str) -> List[Tuple[str, str]]:
-    """Find all files in the temp directory that are valid software files
+    """Checks that file in the temp directory that is valid software files
     Returns
     -------
     list of str
         list of files with an software extension
     """
     software = []
-    logger.info(f'processing files in {os.path.dirname(temp_file_path)}')
+    logger.info(f'Processing files in {os.path.dirname(temp_file_path)}')
     for root, dirs, files in os.walk(os.path.dirname(temp_file_path)):
-        logger.info(f'processing files {files}')
         for file in files:
-            # if is_software_file(valid_file_types, os.path.join(root, file)):
-            software.append((file, os.path.join(root, file)))
-    logger.info(f'processed file: {software}')
+            if is_software_file(valid_file_types, os.path.join(root, file)):
+                software.append((file, os.path.join(root, file)))
+    logger.info(f'Processed files: {software}')
     return software
 
 def is_software_file(valid_file_types: List[str], file_path: str) -> bool:
@@ -132,10 +131,10 @@ def is_software_file(valid_file_types: List[str], file_path: str) -> bool:
     bool
         if the file name has an software extension
     """
-    file_type = imghdr.what(file_path)
+    file_type = ''.join(pathlib.Path(file_path).suffixes)
     valid_file = file_type in valid_file_types
     if not valid_file:
-        logger.warning(f'Ignoring for incorrect file type: {file_type} - {file_path}')
+        logger.warning(f'Ignoring for incorrect file type: {file_type} - {file_path} among {valid_file_types}')
     return valid_file
 
 def hash_file(file_path: str) -> str:
@@ -160,8 +159,7 @@ def hash_file(file_path: str) -> str:
         logger.debug(f'Created hash {hash_string} for file: {file_path}')
         return hash_string
 
-#real file
-def save_file(file_name: str, file_path: str, hash_string: str) -> DummyFile:
+def save_file(file_name: str, file_path: str, hash_string: str, software_key, relative_dir, file_type) -> File:
     """save a file into the database
 
     Parameters
@@ -175,18 +173,32 @@ def save_file(file_name: str, file_path: str, hash_string: str) -> DummyFile:
 
     Returns
     -------
-    DummyFile
-        DummyFile object created in the database
+    File
+        File object created in the database
 
     """
     _, file_extension = os.path.splitext(file_name)
-    uuid_name = f'{uuid.uuid4()}{file_extension}' # no uuid!!!!
+    uuid_name = f'{uuid.uuid4()}{file_extension}'
     save_path = os.path.join(SAVED_FILES, uuid_name)
     copyfile(file_path, save_path)
-    return DummyFile.objects.create(
-        name=uuid_name,
+    
+    latest_file = File.objects.filter(hash=hash_string, software=software_key)
+    if latest_file.exists():
+        logger.debug(f'File already exists: {file_name}')
+        new_version = getattr(latest_file.latest('version'), 'version')+1
+    else:
+        logger.debug(f'New File is being created: {file_name} at {file_path}')
+        new_version = 0
+
+    return File.objects.create(
+        name = file_name,
+        uuid_name=uuid_name,
         file_path=save_path,
         hash=hash_string,
+        version=new_version,
+        software=software_key,
+        relative_dir=relative_dir,
+        file_type=file_type
     )
 
 def clean_temp_directory(temp_file_path: str) -> None:
