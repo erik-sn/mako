@@ -47,3 +47,21 @@ class OptionsSerializer(serializers.Serializer):
     training_steps = serializers.IntegerField(min_value=1, max_value=10000)
     testing_percentage = serializers.IntegerField(min_value=1, max_value=99)
 
+class SoftwareSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.Software
+        fields = '__all__'
+
+class FileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.File
+        fields = '__all__'
+
+class FileUploadEventSerializer(serializers.ModelSerializer):
+    files = FileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.FileUploadEvent
+        fields = ('id', 'files', 'owner', 'created', 'last_updated', 'relative_dir', 'file_type', 'software')
