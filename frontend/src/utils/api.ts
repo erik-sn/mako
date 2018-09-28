@@ -2,7 +2,6 @@ import axios, { AxiosPromise, AxiosResponse } from 'axios';
 
 import { BASE, API } from '../sagas/types';
 import { IMap } from '../interfaces/general';
-import GoogleSearch from '@/models/GoogleSearch';
 
 class Api {
   private base: string;

@@ -6,7 +6,6 @@ import { applyMiddleware, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { hot } from 'react-hot-loader';
 
-import './assets/sass/app.scss';
 import Application from './components/Application';
 import rootReducer from './reducers/root';
 import sagas from './sagas';

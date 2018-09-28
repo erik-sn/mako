@@ -2822,6 +2822,10 @@ domutils@^1.5.1:
     dom-serializer "0"
     domelementtype "1"
 
+dotenv@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.0.0.tgz#24e37c041741c5f4b25324958ebbc34bca965935"
+
 duplexer3@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer3/-/duplexer3-0.1.4.tgz#ee01dd1cac0ed3cbc7fdbea37dc0a8f1ce002ce2"
@@ -3182,16 +3186,6 @@ expect@^22.4.0:
     jest-message-util "^22.4.3"
     jest-regex-util "^22.4.3"
 
-express-handlebars@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/express-handlebars/-/express-handlebars-3.0.0.tgz#80a070bb819b09e4af2ca6d0780f75ce05e75c2f"
-  dependencies:
-    glob "^6.0.4"
-    graceful-fs "^4.1.2"
-    handlebars "^4.0.5"
-    object.assign "^4.0.3"
-    promise "^7.0.0"
-
 express@^4.16.2:
   version "4.16.3"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.3.tgz#6af8a502350db3246ecc4becf6b5a34d22f7ed53"
@@ -3271,14 +3265,14 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-text-webpack-plugin@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/extract-text-webpack-plugin/-/extract-text-webpack-plugin-3.0.2.tgz#5f043eaa02f9750a9258b78c0a6e0dc1408fb2f7"
+extract-text-webpack-plugin@^4.0.0-beta.0:
+  version "4.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/extract-text-webpack-plugin/-/extract-text-webpack-plugin-4.0.0-beta.0.tgz#f7361d7ff430b42961f8d1321ba8c1757b5d4c42"
   dependencies:
     async "^2.4.1"
     loader-utils "^1.1.0"
-    schema-utils "^0.3.0"
-    webpack-sources "^1.0.1"
+    schema-utils "^0.4.5"
+    webpack-sources "^1.1.0"
 
 extsprintf@1.3.0:
   version "1.3.0"
@@ -3865,7 +3859,7 @@ handle-thing@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-1.2.5.tgz#fd7aad726bf1a5fd16dfc29b2f7a6601d27139c4"
 
-handlebars@^4.0.3, handlebars@^4.0.5:
+handlebars@^4.0.3:
   version "4.0.11"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.0.11.tgz#630a35dfe0294bc281edae6ffc5d329fc7982dcc"
   dependencies:
@@ -5966,7 +5960,7 @@ min-document@^2.19.0:
 
 mini-css-extract-plugin@^0.2.0:
   version "0.2.0"
-  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-0.2.0.tgz#7a16b0e1096c86de8e4d1c3b063aa1aeae88d41d"
+  resolved "http://registry.npmjs.org/mini-css-extract-plugin/-/mini-css-extract-plugin-0.2.0.tgz#7a16b0e1096c86de8e4d1c3b063aa1aeae88d41d"
   dependencies:
     loader-utils "^1.1.0"
     webpack-sources "^1.1.0"
@@ -6453,7 +6447,7 @@ object-visit@^1.0.0:
   dependencies:
     isobject "^3.0.0"
 
-object.assign@^4.0.3, object.assign@^4.0.4, object.assign@^4.1.0:
+object.assign@^4.0.4, object.assign@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/object.assign/-/object.assign-4.1.0.tgz#968bf1100d7956bb3ca086f006f846b3bc4008da"
   dependencies:
@@ -7227,7 +7221,7 @@ promise-inflight@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
 
-promise@^7.0.0, promise@^7.1.1:
+promise@^7.1.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
   dependencies:
@@ -9468,9 +9462,16 @@ webpack-log@^1.0.1, webpack-log@^1.1.2:
     loglevelnext "^1.0.1"
     uuid "^3.1.0"
 
-webpack-sources@^1.0.1, webpack-sources@^1.1.0:
+webpack-sources@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-1.1.0.tgz#a101ebae59d6507354d71d8013950a3a8b7a5a54"
+  dependencies:
+    source-list-map "^2.0.0"
+    source-map "~0.6.1"
+
+webpack-sources@^1.1.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-1.3.0.tgz#2a28dcb9f1f45fe960d8f1493252b5ee6530fa85"
   dependencies:
     source-list-map "^2.0.0"
     source-map "~0.6.1"

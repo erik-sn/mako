@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: postgres
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:9.6
+        env:
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        resources: {}
+        # see https://medium.com/google-cloud/local-django-on-kubernetes-with-minikube-89f5ad100378
+        volumeMounts:
+          - name: postgres-volume-mount
+            mountPath: /var/lib/postgresql/data
+
+      volumes:
+        - name: postgres-volume-mount
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+status: {}

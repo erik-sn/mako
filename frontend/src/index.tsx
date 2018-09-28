@@ -10,6 +10,7 @@ import 'core-js/fn/array/find';
 import 'core-js/fn/array/from';
 import raf from 'raf';
 
+import './assets/sass/app.scss';
 import App from './App';
 
 declare var window: any;

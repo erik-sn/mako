@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: api
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: api
+    spec:
+      containers:
+      - name: api
+        image: mako_api:latest
+        env:
+        - name: SECRET_KEY
+          value: "djangosecretkey"
+        - name: SERVER_ENV
+          value: "DEV"
+        - name: ALLOWED_HOSTS
+          value: "*"
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_HOST
+          value: "postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: RABBITMQ_DEFAULT_USER
+          value: "rabbit"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "rabbit"
+        - name: RABBITMQ_HOST
+          value: "rabbit"
+        - name: RABBITMQ_PORT
+          value: "5672"
+        - name: DJANGO_ADMIN_USER
+          value: "test"
+        - name: DJANGO_ADMIN_PASSWORD
+          value: "testthis123"
+        imagePullPolicy: IfNotPresent 
+        resources: {}
+      restartPolicy: Always
+status: {}

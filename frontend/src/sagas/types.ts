@@ -1,8 +1,8 @@
 import { googleSearchActions, imageGroupActions } from '../actions/models';
 
-export const BASE = 'http://localhost:8000';
-export const API = 'http://localhost:8000/api/v1';
-export const STATIC = `${BASE}/static`;
+export const BASE = process.env.BASE_URL;
+export const API = process.env.API_ENDPOINT;
+export const STATIC = process.env.STATIC_URL;
 export const ACCESS_TOKEN = 'auth_token';
 export const REFRESH_TOKEN = 'refresh_token';
 export const REFRESH_TOKEN_EXPIRATION = 'refresh_token_expiration';

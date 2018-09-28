@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: web
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: web
+    spec:
+      containers:
+      - name: web
+        image: mako_web:latest
+        imagePullPolicy: IfNotPresent 
+        resources: {}
+      restartPolicy: Always
+status: {}

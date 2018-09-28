@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: rabbit
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: rabbit
+    spec:
+      containers:
+      - name: rabbit
+        image: rabbitmq:3.7.2-management-alpine
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: "rabbit"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "rabbit"
+        resources: {}
+      restartPolicy: Always
+status: {}
