@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: ambassador
+  name: ambassador
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  httpbin_mapping
+      prefix: /httpbin/
+      service: httpbin.org:80
+      host_rewrite: httpbin.org
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  api
+      prefix: /api
+      rewrite: /api
+      service: api:8000
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  flower
+      prefix: /flower/
+      rewrite: /
+      service: celery:5555
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  web
+      prefix: /
+      rewrite: /
+      service: web:80
+spec:
+  type: LoadBalancer
+  ports:
+  - name: ambassador
+    port: 80
+    targetPort: 80
+  selector:
+    service: ambassador

@@ -1,9 +1,10 @@
 /* eslint-disable */
-const path = require('path');
 const webpack = require('webpack');
+const path = require('path');
+require('dotenv').config();
 
 module.exports = {
-  devtool: 'eval',
+  devtool: 'inline-source-map',
   entry: [
     // enable react hot loading
     'react-hot-loader/patch',
@@ -23,6 +24,9 @@ module.exports = {
     hot: true,
     contentBase: './src',
     port: 3000,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     disableHostCheck: true,
     historyApiFallback: true,
   },
@@ -31,8 +35,12 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
-        BROWSER: JSON.stringify(true),
-        VERSION: JSON.stringify(require('./package.json').version),
+        NODE_ENV: JSON.stringify('development'),
+        ENVIRONMENT: JSON.stringify(process.env.ENVIRONMENT),
+        VERSION: JSON.stringify('dev'),
+        STATIC_URL: JSON.stringify(process.env.STATIC_URL),
+        API_ENDPOINT: JSON.stringify(process.env.API_ENDPOINT),
+        BASE_URL: JSON.stringify(process.env.BASE_URL),
       },
     }),
   ],

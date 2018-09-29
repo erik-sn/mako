@@ -3,9 +3,11 @@ const webpack = require('webpack');
 const path = require('path');
 const autoprefixer = require('autoprefixer');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const VERSION = require('./package.json').version;
 /* eslint-enable */
@@ -17,13 +19,11 @@ module.exports = {
     source code
   */
   devtool: 'source-map',
-  entry: [
-    './src/index.tsx',
-  ],
+  entry: ['./src/index.tsx'],
   output: {
     path: path.join(__dirname, './dist'),
-    filename: `bundle.min.${VERSION}.js`,
-    publicPath: '/assets/',
+    filename: 'bundle.min.[hash].js',
+    publicPath: '/static/',
   },
   plugins: [
     /**
@@ -36,35 +36,37 @@ module.exports = {
     */
     new webpack.DefinePlugin({
       'process.env': {
-        DEV: JSON.stringify(false),
+        NODE_ENV: JSON.stringify('production'),
+        ENVIRONMENT: JSON.stringify('production'),
         // eslint-disable-next-line
-        VERSION: JSON.stringify(VERSION),
+        VERSION: JSON.stringify('[hash]'),
+        STATIC_URL: JSON.stringify('/static'),
+        API_ENDPOINT: JSON.stringify('/api/v1'),
+        BASE_URL: JSON.stringify(''),
       },
     }),
     /**
       After the scss/css is processed and bundle generated
       move it to the webpack output directory
     */
-    new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
-      filename: `bundle.min.${VERSION}.css`,
-      chunkFilename: "[id].css"
+    new ExtractTextPlugin({
+      filename: 'bundle.min.[hash].css',
+      allChunks: true,
     }),
     /**
       Process the output css file - minify, remove comments,
       remove duplicate code
-      */
+    */
     new OptimizeCssAssetsPlugin({
       cssProcessorOptions: { discardComments: { removeAll: true } },
     }),
     /**
       inject the compiled css/js files into the
       index.html file to be served to the user
-      */
+    */
     new HtmlWebpackPlugin({
       template: 'dist/template.html',
-      filename: "index.html"
+      filename: 'index.html',
     }),
     /**
       display the resulting js bundle with a visualization
@@ -74,6 +76,18 @@ module.exports = {
       */
     new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
   ],
+  optimization: {
+    minimizer: [
+      new UglifyJSPlugin({
+        sourceMap: true,
+        uglifyOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
+  },
   module: {
     rules: [
       {
@@ -81,15 +95,17 @@ module.exports = {
         exclude: /(node_modules)/,
         use: [
           {
-            loader: 'ts-loader', 
+            loader: 'babel-loader',
             options: {
-              configFile: 'tsconfig.prod.json',
-            }
-          }
+              babelrc: false,
+              plugins: ['react-hot-loader/babel'],
+            },
+          },
+          {
+            loader: 'ts-loader',
+          },
         ],
-        include: [
-          path.resolve(__dirname, 'src'),
-        ],
+        include: [path.resolve(__dirname, 'src')],
       },
       {
         test: /\.json$/,
@@ -98,18 +114,29 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        // use: ExtractTextPlugin.extract({
-        // fallback: 'style-loader',
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
-        // }),
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader'],
+        }),
       },
       {
         test: /\.scss$/,
-        // use: ExtractTextPlugin.extract({
-        // fallback: 'style-loader',
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
-        // }),
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            'postcss-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                data: `$STATIC_URL: ${JSON.stringify(process.env.STATIC_URL)};`,
+                includePaths: [require('path').resolve(__dirname, 'node_modules')],
+              },
+            },
+          ],
+        }),
       },
+
       {
         test: /\.(ttf|eot|woff|woff2)$/,
         loader: 'file-loader',
@@ -125,6 +152,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['*', '.json', '.', '.js', '.jsx', '.ts', '.tsx'],
-    alias: { '@': path.resolve(__dirname, 'src') }
+    alias: { '@': path.resolve(__dirname, 'src') },
   },
 };

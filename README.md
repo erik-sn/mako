@@ -44,7 +44,7 @@ on either feedback thresholds, time intervals, or on the owner's instruction
 Fill out the `.env.template` file with variables and then copy it as `.env`
 in the root directory - this file is git ignored.
 
-Then In the root directory:
+Then in the api directory:
 ```bash
 docker-compose up
 ```
@@ -61,6 +61,52 @@ npm run dev
 ```
 
 and browse to http://localhost:3000
+
+
+### Kubernetes environment
+
+**Warning: This environment is not ready for production (hard coded variables, secrets,
+etc.). Only used for development purposes right now**
+
+Primary prerequisites:
+
+1. [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+2. [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+2. [Telepresence](https://www.telepresence.io/reference/install)
+
+```
+minikube start
+
+# open the kubernetes dashboard in your browser
+minikube dashboard
+
+# build starting API & web docker containers
+bash build.sh
+
+# Launch all services into the minikube Kubernetes cluster
+kubectl apply -R -f k8s
+
+# retrieve the URL of the API gateway
+minikube service ambassador --url  # open this in your browser
+```
+
+##### Local development in Kubernetes cluster
+
+All services in the Kubernetes environment are behind an API gateway,
+[Ambassador](https://www.getambassador.io/#get-started). Instead of making
+a code change, rebuilding docker containers, and then applying changes
+to the K8S cluster, we can write our code locally and have it apply inside
+the K8S pod it is running in. This will simulate an exact production
+environment.
+
+To do this we use Telepresence. Below is an example command to proxy our
+local api service into the K8S service. From the root directory:
+
+```
+telepresence --swap-deployment mako-api --expose 8000  --docker-run  -it -p 8000:8000 -v $(pwd)/api:/code --entrypoint "/bin/bash" mako_api:latest
+# or run this in the bash script in the repo
+bash dev.sh
+```
 
 ### Contributing
 
