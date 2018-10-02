@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
@@ -13,7 +13,7 @@ import { IImage } from '../../models/GoogleSearch';
 import Dialog from '../generic/Dialog';
 import api from '../../utils/api';
 
-const styles = withStyles<any>(() => ({
+const styles = () => createStyles({
   panel: {
     listStyle: 'none',
     margin: '5px',
@@ -33,7 +33,7 @@ const styles = withStyles<any>(() => ({
   excluded: {
     opacity: 0.3,
   },
-}));
+});
 
 interface IProps {
   image: IImage;
@@ -186,4 +186,4 @@ class Panel extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(Panel);
+export default withStyles(styles)(Panel);

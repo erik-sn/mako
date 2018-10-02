@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 
-import GoogleSearch from '../../models/GoogleSearch';
-import google from '@/reducers/google';
 import UploadEvent from '@/models/UploadEvent';
 import api from '@/utils/api';
 import InlineError from '@/components/generic/InlineError';
 import Loader from '@/components/generic/Loader';
 import ImageDownloader from '@/components/images/ImageDownloader';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   details: {
     display: 'flex',
     flexFlow: 'row wrap',
@@ -61,7 +56,7 @@ const styles = withStyles<any>((theme: any) => ({
     flexFlow: 'row nowrap',
     alignItems: 'center',
   },
-}));
+});
 
 interface IProps {
   classes: any;
@@ -146,4 +141,4 @@ class UploadItem extends Component<IProps, {}> {
   }
 }
 
-export default styles<any>(UploadItem);
+export default withStyles(styles)(UploadItem);

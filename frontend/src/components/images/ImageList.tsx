@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import LeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import RightIcon from '@material-ui/icons/KeyboardArrowRight';
@@ -9,7 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { IImage } from '@/models/GoogleSearch';
 import Panel from './Panel';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles =(theme: any) => createStyles({
   button: {
     margin: theme.spacing.unit,
   },
@@ -36,7 +36,7 @@ const styles = withStyles<any>((theme: any) => ({
   arrow: {
     marginBottom: '12px',
   },
-}));
+});
 
 interface IProps {
   images: IImage[];
@@ -105,4 +105,4 @@ class ImageList extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(ImageList);
+export default withStyles(styles)(ImageList);

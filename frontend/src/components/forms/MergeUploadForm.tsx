@@ -7,22 +7,15 @@ import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, createStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import IconButton from '@material-ui/core/IconButton';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import InfoIcon from '@material-ui/icons/InfoOutline';
-import Typography from '@material-ui/core/Typography';
 
 import { IStore } from '../../interfaces/redux';
-import types from '../../sagas/types';
-import Dialog from '../../components/generic/Dialog';
-import GoogleSearch from '../../models/GoogleSearch';
 import InlineError from '../generic/InlineError';
 import { mergeUploadEvents } from '../../actions/images';
 import UploadEvent from '@/models/UploadEvent';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   form: {
     padding: '0px 0px 30px 0px',
     position: 'relative',
@@ -41,7 +34,7 @@ const styles = withStyles<any>((theme: any) => ({
   infoText: {
     fontSize: '1rem',
   },
-}));
+});
 
 export interface IAsyncErrors {
   name?: string[];
@@ -159,6 +152,6 @@ const mapStateToProps = (state: IStore) => ({
   loading: state.loaders.mergeUploadEvents,
 });
 
-export default styles<any>(
+export default withStyles(styles)(
   withRouter<any>(connect<{}, {}, {}>(mapStateToProps, { mergeUploadEvents })(MergeSearchForm)),
 );
