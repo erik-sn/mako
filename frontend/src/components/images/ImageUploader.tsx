@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CancelIcon from '@material-ui/icons/Cancel';
-import FileUploadIcon from '@material-ui/icons/FileUpload';
+import FileUploadIcon from '@material-ui/icons/CloudUpload';
 import Attachment from '@material-ui/icons/Attachment';
 import Snackbar from '@material-ui/core/Snackbar';
 
@@ -195,9 +195,9 @@ class ImageUploader extends Component<IProps, {}> {
       <div className={classes.root}>
         <Info className={classes.info} title="Uploading Compressed Files">
           <div>
-            This uploader is expecting a compressed directory (.zip, .tar.gz, .gz) of images - they can be of
-            any standard image format. To compress a directory you can run the following command in
-            a terminal:
+            This uploader is expecting a compressed directory (.zip, .tar.gz, .gz) of images - they
+            can be of any standard image format. To compress a directory you can run the following
+            command in a terminal:
             <div className={classes.infoCode}>tar -zcvf compressed.tar.gz **your directory**</div>
             <a
               href="https://www.cyberciti.biz/faq/how-do-i-compress-a-whole-linux-or-unix-directory/"
@@ -208,13 +208,13 @@ class ImageUploader extends Component<IProps, {}> {
           </div>
         </Info>
         <Dropzone
-          className={`${classes.dropzone} ${error ? classes.error : ''} ${
-            uploadedFile ? classes.dropzoneActive : ''
-          }`}
+          className={`${classes.dropzone} ${error ? classes.error : ''} ${uploadedFile
+            ? classes.dropzoneActive
+            : ''}`}
           onDrop={this.handleDrop}
         >
           {uploadedFile &&
-            !uploading && <Attachment color="inherit" className={classes.attachmentIcon} />}
+          !uploading && <Attachment color="inherit" className={classes.attachmentIcon} />}
           {!uploading ? (
             <Typography
               variant="display1"
@@ -228,9 +228,9 @@ class ImageUploader extends Component<IProps, {}> {
           )}
         </Dropzone>
         <div
-          className={`${classes.buttons} ${
-            uploadedFile ? classes.buttonsActive : classes.buttonsHidden
-          }`}
+          className={`${classes.buttons} ${uploadedFile
+            ? classes.buttonsActive
+            : classes.buttonsHidden}`}
         >
           <Button
             className={classes.button}

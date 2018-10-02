@@ -3,20 +3,22 @@ import { Link } from 'react-router-dom';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { withStyles } from '@material-ui/core/styles';
+import { WithStyles, createStyles, withStyles } from '@material-ui/core';
 
-interface IProps {
-  children: JSX.Element;
-  classes: any;
-  label: string;
-  to: string;
-}
-
-const styles = withStyles<any>(() => ({
+const styles = createStyles({
   root: {
     textDecoration: 'none',
   },
-}));
+});
+
+interface IProps {
+  children: JSX.Element;
+  label: string;
+  to: string;
+  classes: {
+    root: string;
+  };
+}
 
 const NavItem = ({ children, classes, label, to }: IProps) => (
   <Link to={`/${to}`} className={classes.root}>
@@ -27,4 +29,4 @@ const NavItem = ({ children, classes, label, to }: IProps) => (
   </Link>
 );
 
-export default styles<any>(NavItem);
+export default withStyles(styles)(NavItem);

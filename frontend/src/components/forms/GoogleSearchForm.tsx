@@ -11,7 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import InfoIcon from '@material-ui/icons/InfoOutline';
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 
 import { IStore } from '@/interfaces/redux';
 import types from '@/sagas/types';
