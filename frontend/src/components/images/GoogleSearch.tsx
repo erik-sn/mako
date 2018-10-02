@@ -127,8 +127,8 @@ class GoogleSearch extends Component<IProps, IState> {
       });
   };
 
-  private toggleLoading = (): void => {
-    event.preventDefault();
+  private toggleLoading = (event: any): void => {
+    event && event.preventDefault();
     this.setState({ loading: !this.state.loading, startNewImageSearch: true });
   };
 

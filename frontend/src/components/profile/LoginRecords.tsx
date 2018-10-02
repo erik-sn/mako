@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import { DateTime } from 'luxon';
 
-import { DATE_FORMAT } from '../../sagas/types';
 import LoginRecord from '@/models/LoginRecord';
 
-const styles = withStyles<any>(() => ({
+const styles = () => createStyles({
   item: {
     margin: '5px 0px',
     padding: '5px 0px',
   },
-}));
+});
 
 interface IProps {
   classes: any;
@@ -36,4 +34,4 @@ class LoginRecords extends Component<IProps, {}> {
   }
 }
 
-export default styles<any>(LoginRecords);
+export default withStyles(styles)(LoginRecords);

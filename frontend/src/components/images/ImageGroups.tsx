@@ -3,7 +3,7 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 
 import api from '@/utils/api';
 import ImageGroup from '@/models/ImageGroup';
@@ -11,12 +11,12 @@ import HeaderError from '@/components/generic/HeaderError';
 import Loader from '@/components/generic/Loader';
 import ImageGroupItem from './ImageGroupItem';
 
-const styles = withStyles<any>(() => ({
+const styles = () => createStyles({
   groupList: {
     display: 'flex',
     flexFlow: 'column nowrap',
   },
-}));
+});
 
 interface IProps {
   classes: any;
@@ -76,4 +76,4 @@ class ImageGroups extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(ImageGroups);
+export default withStyles(styles)(ImageGroups);

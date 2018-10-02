@@ -2,20 +2,18 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ErrorIcon from '@material-ui/icons/ErrorOutline';
 import IconButton from '@material-ui/core/IconButton';
 
 import GoogleSearch from '../../models/GoogleSearch';
-import InlineError from '@/components/generic/InlineError';
 import api from '@/utils/api';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImageDownloader from './ImageDownloader';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   details: {
     display: 'flex',
     flexFlow: 'row wrap',
@@ -53,7 +51,7 @@ const styles = withStyles<any>((theme: any) => ({
   delete: {
     marginRight: theme.spacing.unit,
   },
-}));
+});
 
 interface IProps {
   classes: any;
@@ -136,4 +134,4 @@ class GoogleSearchItem extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(GoogleSearchItem);
+export default withStyles(styles)(GoogleSearchItem);

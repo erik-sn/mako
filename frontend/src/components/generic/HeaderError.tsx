@@ -1,11 +1,11 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 
-const styles = withStyles<any>(() => ({
+const styles = () => createStyles({
   root: {
     textAlign: 'center',
   },
-}));
+});
 
 interface IProps {
   text: string;
@@ -16,4 +16,4 @@ const HeaderError = ({ text, classes }: IProps) => {
   return <h2 className={classes.root}>{text}</h2>;
 };
 
-export default styles<any>(HeaderError);
+export default withStyles(styles)(HeaderError);

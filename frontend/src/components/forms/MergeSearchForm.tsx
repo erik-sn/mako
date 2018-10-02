@@ -2,26 +2,19 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { Formik } from 'formik';
-import isUrl from 'is-url';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import IconButton from '@material-ui/core/IconButton';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import InfoIcon from '@material-ui/icons/InfoOutline';
-import Typography from '@material-ui/core/Typography';
 
 import { IStore } from '../../interfaces/redux';
-import types from '../../sagas/types';
-import Dialog from '../../components/generic/Dialog';
 import GoogleSearch from '../../models/GoogleSearch';
 import InlineError from '../generic/InlineError';
 import { mergeGoogleSearches } from '../../actions/google';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   form: {
     padding: '0px 0px 30px 0px',
     position: 'relative',
@@ -40,7 +33,7 @@ const styles = withStyles<any>((theme: any) => ({
   infoText: {
     fontSize: '1rem',
   },
-}));
+});
 
 export interface IAsyncErrors {
   name?: string[];
@@ -158,6 +151,5 @@ const mapStateToProps = (state: IStore) => ({
   loading: state.loaders.mergeGoogleSearches,
 });
 
-export default styles<any>(
-  withRouter<any>(connect<{}, {}, {}>(mapStateToProps, { mergeGoogleSearches })(MergeSearchForm)),
-);
+const Styled = withStyles(styles)(MergeSearchForm);
+export default withRouter<any>(connect<{}, {}, {}>(mapStateToProps, { mergeGoogleSearches })(Styled));

@@ -7,6 +7,7 @@ import List from '@material-ui/core/List';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import TrainIcon from '@material-ui/icons/FitnessCenter';
 import ClassifyIcon from '@material-ui/icons/MyLocation';
@@ -19,7 +20,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Fade from '@material-ui/core/Fade';
-import { withStyles, WithStyles, createStyles } from '@material-ui/core';
 
 import { clearAuthToken } from '@/actions/auth';
 import { IStore } from '@/interfaces/redux';
@@ -28,39 +28,38 @@ import ImagesOptions from '@/components/nav/ImagesOption';
 import User from '@/models/User';
 import { Link } from 'react-router-dom';
 
-const drawerWidth = 240;
-const styles = (theme: any) =>
-  createStyles({
-    root: {
-      flexGrow: 1,
-    },
-    drawerPaper: {
-      position: 'relative',
-      width: drawerWidth,
-    },
-    username: {
-      margin: '0px 10px 0px 10px',
-    },
-    icon: {
-      color: '#fff',
-    },
-    toolbar: theme.mixins.toolbar,
-    navItem: {
-      textDecoration: null,
-    },
-  });
-
 interface IState {
   open: boolean;
   anchorEl: any;
 }
-interface IProps extends WithStyles<typeof styles> {
+interface IProps {
   classes: any;
   title: string;
   subtitle: string;
   user: User;
   clearAuthToken: () => void;
 }
+
+const drawerWidth = 240;
+const styles = withStyles<any>((theme: any) => ({
+  root: {
+    flexGrow: 1,
+  },
+  drawerPaper: {
+    position: 'relative',
+    width: drawerWidth,
+  },
+  username: {
+    margin: '0px 10px 0px 10px',
+  },
+  icon: {
+    color: '#fff',
+  },
+  toolbar: theme.mixins.toolbar,
+  navItem: {
+    textDecoration: null,
+  },
+}));
 
 export class Nav extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -141,4 +140,5 @@ const mapStateToProps = (state: IStore) => ({
   user: state.auth.user,
 });
 
-export default connect<any, {}, {}>(mapStateToProps, { clearAuthToken })(Nav);
+const ConnectedNav = connect<any, {}, {}>(mapStateToProps, { clearAuthToken })(Nav);
+export default styles<any>(ConnectedNav);

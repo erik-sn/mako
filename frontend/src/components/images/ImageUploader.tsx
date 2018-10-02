@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Dropzone, { ImageFile } from 'react-dropzone';
 import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CancelIcon from '@material-ui/icons/Cancel';
 import FileUploadIcon from '@material-ui/icons/CloudUpload';
@@ -13,7 +13,7 @@ import Info from '@/components/generic/Info';
 import { API } from '@/sagas/types';
 import Loader from '@/components/generic/Loader';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   root: {
     position: 'relative',
     width: '100%',
@@ -81,7 +81,7 @@ const styles = withStyles<any>((theme: any) => ({
     padding: '15px 0px',
     textAlign: 'center',
   },
-}));
+});
 
 interface IProps {
   classes?: any;
@@ -266,4 +266,4 @@ class ImageUploader extends Component<IProps, {}> {
   }
 }
 
-export default styles<any>(ImageUploader);
+export default withStyles(styles)(ImageUploader);

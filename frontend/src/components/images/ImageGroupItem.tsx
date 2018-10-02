@@ -1,20 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ErrorIcon from '@material-ui/icons/ErrorOutline';
 import IconButton from '@material-ui/core/IconButton';
 
-import InlineError from '@/components/generic/InlineError';
 import api from '@/utils/api';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImageDownloader from './ImageDownloader';
 import ImageGroup from '@/models/ImageGroup';
 
-const styles = withStyles<any>((theme: any) => ({
+const styles = (theme: any) => createStyles({
   details: {
     display: 'flex',
     flexFlow: 'row wrap',
@@ -52,7 +50,7 @@ const styles = withStyles<any>((theme: any) => ({
   delete: {
     marginRight: theme.spacing.unit,
   },
-}));
+});
 
 interface IProps {
   classes: any;
@@ -126,4 +124,4 @@ class ImageGroupItem extends Component<IProps, IState> {
   }
 }
 
-export default styles<any>(ImageGroupItem);
+export default withStyles(styles)(ImageGroupItem);
