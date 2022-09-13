@@ -32,7 +32,7 @@ djangorestframework==3.8.2
 djangorestframework-camel-case==0.2.0
 djangorestframework_simplejwt==3.2.3
 fake-useragent==0.1.10
-flower==0.9.2
+flower==1.2.0
 gevent==1.2.2
 greenlet==0.4.12
 gunicorn==19.7.1
